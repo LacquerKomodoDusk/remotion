@@ -5,6 +5,7 @@
   "description": "Remotion-шаблон для игровых нарезок TikTok / Shorts (см. SPEC.md)",
   "type": "module",
   "scripts": {
+    "transcribe": "tsx scripts/transcribe.ts",
     "prep": "tsx scripts/prep.ts",
     "assets": "tsx scripts/prep.ts --assets-only",
     "fetch-sfx": "tsx scripts/fetch-sfx.ts",

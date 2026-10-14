@@ -26,6 +26,7 @@ Remotion-шаблон для игровых нарезок TikTok / Shorts по 
 
 ```powershell
 # 1. положи клип в input\my-clip.mp4 (или .mov)
+npm run transcribe -- my-clip    # Whisper через whisper-skill → input/my-clip.json
 npm run prep -- my-clip          # звук −14 LUFS, анализ, Whisper, public/my-clip/data.json + отчёт
 # 2. в Claude Code: «проанализируй монолог my-clip по SPEC.md, раздел 5а» → public/my-clip/analysis.json
 npm run studio                   # превью и правки
@@ -44,11 +45,15 @@ npm run render -- my-clip        # финал → out/my-clip.mp4
 `prep` берёт слова из первого найденного источника:
 
 1. `input/<clip>.words.json` — ручной список `[{"text": "...", "start": 1.2, "end": 1.5}]`;
-2. `input/<clip>.json` — JSON от **whisper-skill**:
+2. `input/<clip>.json` — JSON от **whisper-skill**. Скилл уже лежит в проекте (`.claude/skills/whisper-skill`),
+   Claude Code в этой папке видит его сам. Один раз поставь движок и модель:
    ```powershell
-   python -m examples.transcribe_one D:\gaming-shorts\input\my-clip.mp4 --language ru --format json --output D:\gaming-shorts\input
+   cd .claude\skills\whisper-skill; python wizard.py; cd ..\..\..
    ```
-   (команда запускается из папки скилла `whisper-skill`);
+   и дальше для каждого клипа:
+   ```powershell
+   npm run transcribe -- my-clip      # → input/my-clip.json (модель: config.json → whisper.skillModel)
+   ```
 3. иначе встроенный whisper.cpp через `@remotion/install-whisper-cpp`: при первом запуске он скачает whisper.cpp и модель `config.json → whisper.model` (по умолчанию `medium`, около 1.5 ГБ).
 
 `npm run prep -- my-clip --no-whisper` пропускает транскрипцию.
