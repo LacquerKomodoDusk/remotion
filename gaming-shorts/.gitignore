@@ -1,0 +1,13 @@
+node_modules/
+out/
+whisper.cpp/
+public/_assets/
+public/*/source.mp4
+public/*/audio.wav
+public/*/tmp/
+input/*
+!input/.gitkeep
+assets/sfx/*
+!assets/sfx/.gitkeep
+assets/music/*
+!assets/music/.gitkeep

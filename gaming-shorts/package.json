@@ -1,0 +1,33 @@
+{
+  "name": "gaming-shorts",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Remotion-шаблон для игровых нарезок TikTok / Shorts (см. SPEC.md)",
+  "type": "module",
+  "scripts": {
+    "prep": "tsx scripts/prep.ts",
+    "assets": "tsx scripts/prep.ts --assets-only",
+    "fetch-sfx": "tsx scripts/fetch-sfx.ts",
+    "studio": "remotion studio src/index.ts",
+    "render": "tsx scripts/render.ts",
+    "check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@remotion/bundler": "4.0.535",
+    "@remotion/cli": "4.0.535",
+    "@remotion/google-fonts": "4.0.535",
+    "@remotion/install-whisper-cpp": "4.0.535",
+    "@remotion/media": "4.0.535",
+    "@remotion/renderer": "4.0.535",
+    "@remotion/studio": "4.0.535",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "remotion": "4.0.535"
+  },
+  "devDependencies": {
+    "@types/node": "22.15.3",
+    "@types/react": "19.2.7",
+    "tsx": "4.20.6",
+    "typescript": "5.9.3"
+  }
+}

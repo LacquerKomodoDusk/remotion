@@ -1,0 +1,111 @@
+{
+  "composition": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30,
+    "crf": 18,
+    "audioBitrate": "320k"
+  },
+  "tools": {
+    "ffmpeg": "auto",
+    "ffprobe": "auto"
+  },
+  "prep": {
+    "loudnessLufs": -14,
+    "reencodeVideo": true,
+    "keyframeEverySec": 1
+  },
+  "layout": {
+    "sourceWebcamFraction": 0.372,
+    "webcamFocus": { "x": 0.5, "y": 0.45 },
+    "gameplayFocus": { "x": 0.5, "y": 0.5 },
+    "transitionFrames": 7,
+    "states": {
+      "default": { "webcam": 0.35, "webcamZoom": 1.0 },
+      "emotion": { "webcam": 0.55, "webcamZoom": 1.15 },
+      "gameplay": { "webcam": 0.2, "webcamZoom": 1.0 }
+    },
+    "zoomPunch": { "peak": 1.2, "settle": 1.05, "frames": [0, 3, 6] },
+    "shake": { "frames": 5, "amplitudePx": 14 }
+  },
+  "accents": {
+    "windowMs": 100,
+    "baselineWindowSec": 45,
+    "slidingBaselineFromSec": 30,
+    "emotionAboveBaselineDb": 8,
+    "emotionMinMs": 300,
+    "gameplayAboveBaselineDb": 12,
+    "gameplayMaxMs": 200,
+    "minGapSec": 1.5,
+    "maxShareOfVideo": 0.4,
+    "paddingSec": 0.15,
+    "useAudioWhenAnalysis": false
+  },
+  "deadTime": {
+    "black": {
+      "enabled": true,
+      "lumaThreshold": 18,
+      "minSec": 0.5,
+      "freezeSec": 0.4
+    },
+    "silence": {
+      "enabled": true,
+      "aboveBaselineDb": 3,
+      "minSec": 1.0,
+      "action": "speedup",
+      "speed": 3,
+      "requireNoMotion": false,
+      "motionThreshold": 2.5
+    }
+  },
+  "length": {
+    "mode": "keep",
+    "targetSec": null,
+    "maxSec": 60,
+    "minSec": 5,
+    "fitPaddingSec": 1.5
+  },
+  "whisper": {
+    "enabled": true,
+    "version": "1.6.0",
+    "model": "medium",
+    "language": "ru",
+    "chunkSec": 240,
+    "overlapSec": 1
+  },
+  "captions": {
+    "fontSize": 86,
+    "maxWordsPerPage": 3,
+    "pageGapSec": 0.45,
+    "holdSec": 0.35,
+    "yFraction": 0.62,
+    "color": "#FFFFFF",
+    "activeColor": "#FFD400",
+    "keywordColor": "#39FF14",
+    "strokePx": 8,
+    "emotionScale": 1.2,
+    "keywordScale": 1.15,
+    "emotionWords": ["ЖЕСТЬ", "НЕТ", "ЧТО", "КАК", "БЛИН", "ВАУ", "ОГО", "ЖЕСТКО", "ДА"],
+    "stripPunctuation": true,
+    "safeTopPx": 150,
+    "safeBottomPx": 250
+  },
+  "profanity": {
+    "replacement": "КРЯ",
+    "muteBeforeFrames": 2,
+    "muteAfterFrames": 1,
+    "quackVolume": 1.0,
+    "maxPerSec": 0.3,
+    "warnFirstSec": 5
+  },
+  "audio": {
+    "voiceTrack": null,
+    "sourceVolume": 1.0,
+    "musicVolume": 0.08,
+    "musicDuckFactor": 0.5,
+    "preClimaxSilenceSec": 0.7,
+    "sfxVolume": 0.7,
+    "wordClickVolume": 0.05,
+    "whooshOnJumpSec": 1.0
+  }
+}

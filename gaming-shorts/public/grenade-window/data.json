@@ -1,0 +1,95 @@
+{
+  "version": 1,
+  "clip": "grenade-window",
+  "source": {
+    "file": "source.mp4",
+    "width": 972,
+    "height": 1728,
+    "fps": 60,
+    "durationSec": 22
+  },
+  "words": [],
+  "profanity": [],
+  "accents": [
+    {
+      "start": 3.85,
+      "end": 4.550000000000001,
+      "type": "emotion",
+      "source": "audio"
+    },
+    {
+      "start": 10.55,
+      "end": 13.250000000000002,
+      "type": "emotion",
+      "source": "audio"
+    },
+    {
+      "start": 16.950000000000003,
+      "end": 18.05,
+      "type": "emotion",
+      "source": "audio"
+    },
+    {
+      "start": 20.650000000000002,
+      "end": 22,
+      "type": "emotion",
+      "source": "audio"
+    }
+  ],
+  "deadTime": [
+    {
+      "start": 0,
+      "end": 4,
+      "kind": "silence",
+      "action": "speedup",
+      "speed": 3,
+      "freezeSec": null
+    },
+    {
+      "start": 4.6000000000000005,
+      "end": 7.800000000000001,
+      "kind": "silence",
+      "action": "speedup",
+      "speed": 3,
+      "freezeSec": null
+    },
+    {
+      "start": 8.8,
+      "end": 10.700000000000001,
+      "kind": "silence",
+      "action": "speedup",
+      "speed": 3,
+      "freezeSec": null
+    },
+    {
+      "start": 15,
+      "end": 17,
+      "kind": "silence",
+      "action": "speedup",
+      "speed": 3,
+      "freezeSec": null
+    },
+    {
+      "start": 19.1,
+      "end": 20.1,
+      "kind": "silence",
+      "action": "speedup",
+      "speed": 3,
+      "freezeSec": null
+    }
+  ],
+  "report": [
+    "⚠ транскрипции нет: субтитры и «кря» выключены",
+    "исходник: 22.00 с, 972×1728, 60.00 fps",
+    "после вырезок: 14.80 с (8 кусков), с учётом analysis.json",
+    "baseline звука: -30.5 dBFS",
+    "слов: 0, акцентов по звуку: 4 (emotion 4, gameplay 0), итоговых: 4",
+    "мёртвое время: silence 0.00–4.00 speedup ×3, silence 4.60–7.80 speedup ×3, silence 8.80–10.70 speedup ×3, silence 15.00–17.00 speedup ×3, silence 19.10–20.10 speedup ×3",
+    "мат: 0",
+    "⚠ assets/sfx: нет файлов для «quack» — эффект выключен: «кря» на мате (quack*.mp3)",
+    "⚠ assets/sfx: нет файлов для «whoosh» — эффект выключен: свуши на склейках (whoosh*.mp3)",
+    "⚠ assets/sfx: нет файлов для «boom» — эффект выключен: удар на gameplay-акцентах (boom*.mp3)",
+    "⚠ assets/sfx: нет файлов для «error» — эффект выключен: звук на freeze после чёрного экрана (error*.mp3)",
+    "⚠ assets/music пуст — музыка выключена"
+  ]
+}
