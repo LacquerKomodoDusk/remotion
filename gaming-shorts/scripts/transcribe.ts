@@ -1,6 +1,8 @@
-// npm run transcribe -- <clip>
-// Транскрибирует input/<clip>.* через whisper-skill (.claude/skills/whisper-skill)
-// и кладёт input/<clip>.json — его потом подхватит npm run prep.
+// npm run transcribe -- <clip> [--openai]
+// Транскрибирует input/<clip>.* и кладёт input/<clip>.json — его потом подхватит npm run prep.
+// Движок: config.json → whisper.transcriber
+//   "whisper-skill"  — .claude/skills/whisper-skill (faster-whisper / whisper.cpp / ..., быстрее)
+//   "openai-whisper" — оригинальный github.com/openai/whisper (pip install -U openai-whisper)
 
 import {spawnSync} from 'node:child_process';
 import fs from 'node:fs';
@@ -32,25 +34,56 @@ if (!python) {
 	process.exit(1);
 }
 
-const res = spawnSync(
-	python,
-	[
-		'-m',
-		'examples.transcribe_one',
-		inputFile,
-		'--language',
-		config.whisper.language,
-		'--model',
-		config.whisper.skillModel,
-		'--format',
-		'json',
-		'--output',
-		path.join(root, 'input'),
-	],
-	{cwd: skillDir, stdio: 'inherit'},
-);
+const useOpenai = process.argv.includes('--openai') || config.whisper.transcriber === 'openai-whisper';
+if (useOpenai && spawnSync(python, ['-c', 'import whisper']).status !== 0) {
+	console.error('openai-whisper не установлен: pip install -U openai-whisper  (или из main: pip install -U git+https://github.com/openai/whisper.git@main)');
+	process.exit(1);
+}
+
+// Оригинальный whisper пишет <имя>.json с segments[].words[] — тот же формат, что читает prep
+const res = useOpenai
+	? spawnSync(
+			python,
+			[
+				'-m',
+				'whisper',
+				inputFile,
+				'--model',
+				config.whisper.skillModel,
+				'--language',
+				config.whisper.language,
+				'--word_timestamps',
+				'True',
+				'--output_format',
+				'json',
+				'--output_dir',
+				path.join(root, 'input'),
+			],
+			{stdio: 'inherit'},
+		)
+	: spawnSync(
+			python,
+			[
+				'-m',
+				'examples.transcribe_one',
+				inputFile,
+				'--language',
+				config.whisper.language,
+				'--model',
+				config.whisper.skillModel,
+				'--format',
+				'json',
+				'--output',
+				path.join(root, 'input'),
+			],
+			{cwd: skillDir, stdio: 'inherit'},
+		);
 if (res.status !== 0) {
-	console.error('\nwhisper-skill завершился с ошибкой. Если бэкенд не установлен: cd .claude/skills/whisper-skill; python wizard.py');
+	console.error(
+		useOpenai
+			? '\nopenai-whisper завершился с ошибкой'
+			: '\nwhisper-skill завершился с ошибкой. Если бэкенд не установлен: cd .claude/skills/whisper-skill; python wizard.py',
+	);
 	process.exit(res.status ?? 1);
 }
 

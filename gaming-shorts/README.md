@@ -54,6 +54,9 @@ npm run render -- my-clip        # финал → out/my-clip.mp4
    ```powershell
    npm run transcribe -- my-clip      # → input/my-clip.json (модель: config.json → whisper.skillModel)
    ```
+   Вместо whisper-skill можно использовать оригинальный [openai/whisper](https://github.com/openai/whisper):
+   `pip install -U openai-whisper`, затем `npm run transcribe -- my-clip --openai`
+   (или `config.json → whisper.transcriber: "openai-whisper"`).
 3. иначе встроенный whisper.cpp через `@remotion/install-whisper-cpp`: при первом запуске он скачает whisper.cpp и модель `config.json → whisper.model` (по умолчанию `medium`, около 1.5 ГБ).
 
 `npm run prep -- my-clip --no-whisper` пропускает транскрипцию.
