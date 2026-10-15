@@ -26,6 +26,10 @@ If you are writing Remotion React Markup, load [Remotion Markup Best Practices](
 
 For static maps, animated routes and markers, geographic explainers, Mapbox, MapLibre, MapTiler, GeoJSON, or 3D geographic flyovers, load [Remotion Maps](./remotion-maps/SKILL.md).
 
+## Google Whisk
+
+For generating images or short clips with Google Whisk and using them in a video, load [Remotion Google Whisk](./remotion-google-whisk/SKILL.md).
+
 ## Multimedia
 
 For achieving multimedia tasks in the browser, such as trimming, cropping videos, or getting metadata from them, load [Remotion Multimedia](./remotion-multimedia/SKILL.md)

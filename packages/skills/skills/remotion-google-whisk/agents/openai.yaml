@@ -1,0 +1,7 @@
+interface:
+  display_name: '/remotion-google-whisk'
+  short_description: 'Use Google Whisk images and clips in Remotion videos'
+  icon_small: './assets/remotion-icon.svg'
+  icon_large: './assets/remotion-icon.svg'
+  brand_color: '#0B84F3'
+  default_prompt: '$remotion-google-whisk: Plan Whisk images for a 3-scene product teaser and add them to my video.'
