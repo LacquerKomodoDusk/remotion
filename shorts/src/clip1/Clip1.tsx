@@ -20,6 +20,7 @@ import {
 	SEGS,
 	SFX,
 	SLOTS,
+	TOTAL_FRAMES,
 	transitionsFor,
 	VOICE_RANGES,
 } from './plan';
@@ -29,7 +30,7 @@ const SEAM = 776;
 const GAME_SRC_H = 1308; // game.mp4: 1080×1308
 const GAME_REGION_H = H - SEAM;
 const CAM_SPLIT = {x: 0, y: 0, w: W, h: 777};
-const CAM_FULL = {x: -189, y: 330, w: 1458, h: 1049};
+const CAM_FULL = {x: -189, y: 270, w: 1458, h: 1049};
 
 const layoutProgress = (g: number) => {
 	let p = 0;
@@ -47,8 +48,14 @@ const layoutProgress = (g: number) => {
 const envelope = (t: number, ranges: [number, number][], ramp: number) =>
 	Math.max(0, ...ranges.map(([a, b]) => (t >= a && t <= b ? 1 : Math.max(0, 1 - Math.min(Math.abs(t - a), Math.abs(t - b)) / ramp))));
 
-const SegmentView: React.FC<{seg: Seg}> = ({seg}) => {
-	const frame = useCurrentFrame();
+// Предкадры входа: сцена начинает рисоваться раньше, поверх уходящей
+const preroll = (seg: Seg) => {
+	const {enter} = transitionsFor(seg.id);
+	return enter.type === 'none' ? 0 : enter.frames;
+};
+
+const SegmentView: React.FC<{seg: Seg; pre: number}> = ({seg, pre}) => {
+	const frame = useCurrentFrame() - pre;
 	const g = SEG_START[seg.id] + frame;
 	const len = segLen(seg);
 	const p = layoutProgress(g);
@@ -58,13 +65,13 @@ const SegmentView: React.FC<{seg: Seg}> = ({seg}) => {
 	const [z0, z1] = seg.gameZoom;
 	const gameZoom =
 		Math.abs(z1 - z0) > 0.1
-			? z0 + (z1 - z0) * spring({frame, fps: FPS, durationInFrames: 14, config: {damping: 12, stiffness: 200}})
+			? z0 + (z1 - z0) * spring({frame: Math.max(0, frame), fps: FPS, durationInFrames: 14, config: {damping: 12, stiffness: 200}})
 			: interpolate(frame, [0, len], [z0, z1]);
 	const [ox, oy] = seg.zoomOrigin ?? [0.5, 0.5];
 	const [c0, c1] = seg.camZoom ?? [1, 1];
 	const camZoom = seg.id === 'react2' ? c0 + (c1 - c0) * spring({frame: frame - 14, fps: FPS, durationInFrames: 12, config: {damping: 10}}) : interpolate(frame, [0, len], [c0, c1]);
 
-	const trim = Math.round(seg.src[0] * FPS);
+	const trim = Math.max(0, Math.round(seg.src[0] * FPS - pre * seg.rate));
 	const video = (file: string, style: React.CSSProperties) => {
 		const v = <OffthreadVideo src={staticFile(file)} trimBefore={trim} playbackRate={seg.rate} muted style={style} />;
 		return seg.freezeSec !== undefined ? <Freeze frame={0}>{v}</Freeze> : v;
@@ -72,7 +79,7 @@ const SegmentView: React.FC<{seg: Seg}> = ({seg}) => {
 	const {enter, exit} = transitionsFor(seg.id);
 
 	return (
-		<TransitionWrap id={seg.id} durationInFrames={len} enter={enter} exit={exit}>
+		<TransitionWrap id={seg.id} logicalFrame={frame} durationInFrames={len} enter={enter} exit={exit}>
 			<AbsoluteFill style={{background: COLORS.black}}>
 				{/* Игра */}
 				<div style={{position: 'absolute', left: 0, top: SEAM, width: W, height: GAME_REGION_H, overflow: 'hidden'}}>
@@ -118,7 +125,7 @@ const SegmentAudio: React.FC<{seg: Seg}> = ({seg}) => {
 	return (
 		<>
 			<Audio src={staticFile('voice.wav')} trimBefore={trim} playbackRate={seg.rate} volume={(f) => 1 - envelope(srcTime(f), MAT_RANGES, 0.015)} />
-			<Audio src={staticFile('game.wav')} trimBefore={trim} playbackRate={seg.rate} volume={(f) => 1 - 0.5 * envelope(srcTime(f), VOICE_RANGES, 0.08)} />
+			<Audio src={staticFile('game.wav')} trimBefore={trim} playbackRate={seg.rate} volume={(f) => (1 - 0.5 * envelope(srcTime(f), VOICE_RANGES, 0.08)) * (1 - envelope(srcTime(f), MAT_RANGES, 0.015))} />
 		</>
 	);
 };
@@ -133,7 +140,9 @@ const SUB_EVENTS: SubEvent[] = SEGS.filter((s) => s.freezeSec === undefined).fla
 		}
 		const from = Math.max(SEG_START[s.id], at(s.id, visible[0].start));
 		const last = phrase[phrase.length - 1];
-		const to = Math.min(segEnd(s.id), at(s.id, last.end + PHRASE_HOLD_SEC));
+		const {exit} = transitionsFor(s.id);
+		// субтитр не уезжает в следующую сцену: гаснет к началу перехода
+		const to = Math.min(segEnd(s.id) - (exit.type === 'none' ? 0 : exit.frames), at(s.id, last.end + PHRASE_HOLD_SEC));
 		return [
 			{
 				from,
@@ -175,11 +184,18 @@ export const Clip1: React.FC = () => {
 	return (
 		<AbsoluteFill style={{background: COLORS.black}}>
 			<AbsoluteFill style={{transform: `translate(${shake.x}px, ${shake.y}px) scale(${shake.x || shake.y ? 1.03 : 1})`}}>
-				{SEGS.map((s) => (
-					<Sequence key={s.id} from={SEG_START[s.id]} durationInFrames={segLen(s)} name={s.id}>
-						<SegmentView seg={s} />
-					</Sequence>
-				))}
+				{SEGS.map((s) => {
+					// у хука нет предыдущей сцены: его вход проигрывается в конце ролика (луп)
+					const pre = s.id === SEGS[0].id ? 0 : preroll(s);
+					return (
+						<Sequence key={s.id} from={SEG_START[s.id] - pre} durationInFrames={segLen(s) + pre} name={s.id}>
+							<SegmentView seg={s} pre={pre} />
+						</Sequence>
+					);
+				})}
+				<Sequence from={TOTAL_FRAMES - preroll(SEGS[0])} durationInFrames={preroll(SEGS[0])} name="loop:hook">
+					<SegmentView seg={SEGS[0]} pre={preroll(SEGS[0])} />
+				</Sequence>
 			</AbsoluteFill>
 
 			{OVERLAYS.map((o, i) => {
