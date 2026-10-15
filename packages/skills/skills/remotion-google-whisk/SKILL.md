@@ -52,6 +52,14 @@ Give the user a short brief per asset, for example:
 
 Don't put text, logos or UI that must be legible into the Whisk image. Whisk may garble them. Render text with Remotion on top of the image instead.
 
+## Saved styles
+
+Reusable style presets with Whisk inputs, palette and a matching Remotion treatment:
+
+- [Dark Knight Editorial](styles/dark-knight-editorial.md): dark fantasy and knightcore subjects shot like a moody monochrome fashion editorial.
+
+When the user names a style or the request fits one, load its file and follow it for every asset and scene.
+
 ## Adding the files to the project
 
 Ask the user to download the results and put them into the `public/whisk/` folder with the file names from the brief.
