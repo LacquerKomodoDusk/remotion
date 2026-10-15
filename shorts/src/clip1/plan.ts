@@ -3,6 +3,9 @@ import {WORDS} from './transcript.ts';
 
 export const FPS = 60;
 
+// Цензура мата (утка в субтитрах + «кря» + заглушение). В clip1 по просьбе автора мат оставлен (v2).
+export const CENSOR = false;
+
 export type Layout = 'split' | 'full';
 
 export type Seg = {
@@ -173,7 +176,7 @@ export const SFX: SfxCue[] = [
 export type Slot = {name: string; expectedFile: string; description: string; reason: string; from: number; durationInFrames: number; volumeDb: number};
 
 // «Кря» на каждый мат — точно по таймкодам слова
-const matSlots: Slot[] = SEGS.filter((s) => s.freezeSec === undefined).flatMap((s) =>
+const matSlots: Slot[] = SEGS.filter((s) => CENSOR && s.freezeSec === undefined).flatMap((s) =>
 	PHRASES.flat()
 		.filter((w) => w.mat && w.start >= s.src[0] && w.start < s.src[1])
 		.map((w) => ({
@@ -202,7 +205,7 @@ export const SLOTS: Slot[] = [
 
 // Мат глушим на обеих дорожках (в game.wav после разделения остаётся эхо голоса), даже если «кря» ещё нет
 export const MAT_RANGES: [number, number][] = PHRASES.flat()
-	.filter((w) => w.mat)
+	.filter((w) => CENSOR && w.mat)
 	.map((w) => [w.start - 0.06, w.end + 0.08]);
 // Где звучит голос — под ним игра тише на 6 dB
 export const VOICE_RANGES: [number, number][] = PHRASES.flat().map((w) => [w.start - 0.15, w.end + 0.15]);

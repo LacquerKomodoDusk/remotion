@@ -7,6 +7,7 @@ import {TransitionWrap} from '../components/Transitions';
 import {COLORS, H, W} from '../theme';
 import {
 	at,
+	CENSOR,
 	FPS,
 	LAYOUT_SWITCHES,
 	MAT_RANGES,
@@ -153,7 +154,7 @@ const SUB_EVENTS: SubEvent[] = SEGS.filter((s) => s.freezeSec === undefined).fla
 					color: COLOR_OF[w.style.color],
 					size: w.style.size,
 					shake: w.style.shake,
-					censored: w.mat,
+					censored: CENSOR && w.mat,
 				})),
 			},
 		];
