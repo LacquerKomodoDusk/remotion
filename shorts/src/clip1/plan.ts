@@ -152,6 +152,14 @@ export const OVERLAYS: Overlay[] = [
 ];
 
 // ---------- Звуки ----------
+// Баланс голос/игра: игра в целом тише, под речью — ещё ниже
+export const GAME_BASE_DB = -4;
+export const GAME_DUCK_DB = -9;
+// Голосовая дорожка вне речи (там после разделения остаётся фон игры)
+export const VOICE_GATE_DB = -14;
+// Общая поправка всех эффектов относительно голоса
+export const SFX_TRIM_DB = -3;
+
 // relDb — на сколько dB звук тише пиков голоса (уровни меряет scripts/measure_levels.py)
 export type SfxCue = {file: string; frame: number; relDb: number};
 export const SFX: SfxCue[] = [

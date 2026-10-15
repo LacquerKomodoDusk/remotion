@@ -4,11 +4,15 @@ import {Callout, ComicBurst, ComicRays, Counter, EmojiPop, FlashCut, HalftoneFra
 import {SoundSlot, Sfx} from '../components/SoundSlot';
 import {type SubEvent, Subtitles} from '../components/Subtitles';
 import {TransitionWrap} from '../components/Transitions';
-import {COLORS, H, W} from '../theme';
+import {COLORS, dbToGain, H, W} from '../theme';
 import {
 	at,
 	CENSOR,
 	FPS,
+	GAME_BASE_DB,
+	VOICE_GATE_DB,
+	GAME_DUCK_DB,
+	SFX_TRIM_DB,
 	LAYOUT_SWITCHES,
 	MAT_RANGES,
 	OVERLAYS,
@@ -125,8 +129,8 @@ const SegmentAudio: React.FC<{seg: Seg}> = ({seg}) => {
 	const srcTime = (f: number) => seg.src[0] + (f / FPS) * seg.rate;
 	return (
 		<>
-			<Audio src={staticFile('voice.wav')} trimBefore={trim} playbackRate={seg.rate} volume={(f) => 1 - envelope(srcTime(f), MAT_RANGES, 0.015)} />
-			<Audio src={staticFile('game.wav')} trimBefore={trim} playbackRate={seg.rate} volume={(f) => (1 - 0.5 * envelope(srcTime(f), VOICE_RANGES, 0.08)) * (1 - envelope(srcTime(f), MAT_RANGES, 0.015))} />
+			<Audio src={staticFile('voice_proc.wav')} trimBefore={trim} playbackRate={seg.rate} volume={(f) => dbToGain(VOICE_GATE_DB * (1 - envelope(srcTime(f), VOICE_RANGES, 0.06))) * (1 - envelope(srcTime(f), MAT_RANGES, 0.015))} />
+			<Audio src={staticFile('game.wav')} trimBefore={trim} playbackRate={seg.rate} volume={(f) => dbToGain(GAME_BASE_DB + GAME_DUCK_DB * envelope(srcTime(f), VOICE_RANGES, 0.08)) * (1 - envelope(srcTime(f), MAT_RANGES, 0.015))} />
 		</>
 	);
 };
@@ -284,7 +288,7 @@ export const Clip1: React.FC = () => {
 				</Sequence>
 			))}
 			{SFX.map((c, i) => (
-				<Sfx key={i} file={c.file} from={c.frame} relDb={c.relDb} />
+				<Sfx key={i} file={c.file} from={c.frame} relDb={c.relDb + SFX_TRIM_DB} />
 			))}
 			{SLOTS.map((s) => (
 				<SoundSlot key={s.name} slot={{name: s.name, expectedFile: s.expectedFile, description: s.description, from: s.from, durationInFrames: s.durationInFrames, relDb: s.relDb}} />

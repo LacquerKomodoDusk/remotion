@@ -20,5 +20,8 @@ walk(dst);
 fs.writeFileSync(path.join(root, 'src', 'available-assets.json'), JSON.stringify(list.sort(), null, 1));
 console.log(`assets: ${list.length} файлов`);
 
+// Голос: срез низа + компрессор, чтобы тихие фразы не тонули рядом с криками
+execFileSync('ffmpeg', ['-v', 'error', '-y', '-i', path.join(root, 'public', 'voice.wav'), '-af', 'highpass=f=80,acompressor=threshold=-30dB:ratio=4:attack=5:release=150:makeup=8dB,alimiter=limit=0.89', path.join(root, 'public', 'voice_proc.wav')], {stdio: 'inherit'});
+
 // Уровни звуков для сведения относительно голоса
-execFileSync('python3', [path.resolve(root, '..', 'scripts', 'measure_levels.py'), dst, path.join(root, 'public', 'voice.wav'), path.join(root, 'src', 'levels.json')], {stdio: 'inherit'});
+execFileSync('python3', [path.resolve(root, '..', 'scripts', 'measure_levels.py'), dst, path.join(root, 'public', 'voice_proc.wav'), path.join(root, 'src', 'levels.json')], {stdio: 'inherit'});
