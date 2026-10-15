@@ -284,10 +284,10 @@ export const Clip1: React.FC = () => {
 				</Sequence>
 			))}
 			{SFX.map((c, i) => (
-				<Sfx key={i} file={c.file} from={c.frame} volumeDb={c.volumeDb} />
+				<Sfx key={i} file={c.file} from={c.frame} relDb={c.relDb} />
 			))}
 			{SLOTS.map((s) => (
-				<SoundSlot key={s.name} slot={{name: s.name, expectedFile: s.expectedFile, description: s.description, from: s.from, durationInFrames: s.durationInFrames, volumeDb: s.volumeDb}} />
+				<SoundSlot key={s.name} slot={{name: s.name, expectedFile: s.expectedFile, description: s.description, from: s.from, durationInFrames: s.durationInFrames, relDb: s.relDb}} />
 			))}
 		</AbsoluteFill>
 	);

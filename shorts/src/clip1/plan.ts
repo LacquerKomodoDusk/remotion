@@ -152,28 +152,29 @@ export const OVERLAYS: Overlay[] = [
 ];
 
 // ---------- Звуки ----------
-export type SfxCue = {file: string; frame: number; volumeDb: number};
+// relDb — на сколько dB звук тише пиков голоса (уровни меряет scripts/measure_levels.py)
+export type SfxCue = {file: string; frame: number; relDb: number};
 export const SFX: SfxCue[] = [
-	{file: 'generated/impact_03.wav', frame: at('hook', 10.35), volumeDb: -6},
-	{file: 'generated/whoosh_03.wav', frame: segStart('walk') - 10, volumeDb: -6},
-	{file: 'generated/pop_02.wav', frame: segStart('walk'), volumeDb: -8},
-	{file: 'generated/impact_02.wav', frame: at('kill1', 7.4), volumeDb: -5},
-	{file: 'generated/whoosh_01.wav', frame: segStart('hello') - 10, volumeDb: -6},
-	{file: 'generated/pop_soft_01.wav', frame: at('hello', 8.7), volumeDb: -8},
-	{file: 'generated/riser_01.wav', frame: segStart('jump') - FPS, volumeDb: -9},
-	{file: 'generated/impact_heavy_01.wav', frame: segStart('jump'), volumeDb: -3},
-	{file: 'generated/bass_drop_01.wav', frame: segStart('jump'), volumeDb: -4},
-	{file: 'generated/tick_01.wav', frame: at('hits', 10.36), volumeDb: -6},
-	{file: 'generated/tick_02.wav', frame: at('hits', 10.5), volumeDb: -6},
-	{file: 'generated/ding_01.wav', frame: at('kill2', 10.85), volumeDb: -9},
-	{file: 'generated/whoosh_02.wav', frame: segStart('react1') - 8, volumeDb: -6},
-	{file: 'generated/pop_03.wav', frame: at('react2', 13.4), volumeDb: -8},
-	{file: 'generated/whoosh_01.wav', frame: segStart('tail') - 8, volumeDb: -7},
-	{file: 'generated/pop_02.wav', frame: at('tail', 14.7), volumeDb: -8},
-	{file: 'generated/whoosh_03.wav', frame: TOTAL_FRAMES - 12, volumeDb: -8},
+	{file: 'generated/impact_03.wav', frame: at('hook', 10.35), relDb: -6},
+	{file: 'generated/whoosh_03.wav', frame: segStart('walk') - 10, relDb: -10},
+	{file: 'generated/pop_02.wav', frame: segStart('walk'), relDb: -12},
+	{file: 'generated/impact_02.wav', frame: at('kill1', 7.4), relDb: -6},
+	{file: 'generated/whoosh_01.wav', frame: segStart('hello') - 10, relDb: -10},
+	{file: 'generated/pop_soft_01.wav', frame: at('hello', 8.7), relDb: -12},
+	{file: 'generated/riser_01.wav', frame: segStart('jump') - FPS, relDb: -12},
+	{file: 'generated/impact_heavy_01.wav', frame: segStart('jump'), relDb: -3},
+	{file: 'generated/bass_drop_01.wav', frame: segStart('jump'), relDb: -8},
+	{file: 'generated/tick_01.wav', frame: at('hits', 10.36), relDb: -12},
+	{file: 'generated/tick_02.wav', frame: at('hits', 10.5), relDb: -12},
+	{file: 'generated/ding_01.wav', frame: at('kill2', 10.85), relDb: -12},
+	{file: 'generated/whoosh_02.wav', frame: segStart('react1') - 8, relDb: -10},
+	{file: 'generated/pop_03.wav', frame: at('react2', 13.4), relDb: -12},
+	{file: 'generated/whoosh_01.wav', frame: segStart('tail') - 8, relDb: -10},
+	{file: 'generated/pop_02.wav', frame: at('tail', 14.7), relDb: -12},
+	{file: 'generated/whoosh_03.wav', frame: TOTAL_FRAMES - 12, relDb: -10},
 ];
 
-export type Slot = {name: string; expectedFile: string; description: string; reason: string; from: number; durationInFrames: number; volumeDb: number};
+export type Slot = {name: string; expectedFile: string; description: string; reason: string; from: number; durationInFrames: number; relDb: number};
 
 // «Кря» на каждый мат — точно по таймкодам слова
 const matSlots: Slot[] = SEGS.filter((s) => CENSOR && s.freezeSec === undefined).flatMap((s) =>
@@ -186,7 +187,7 @@ const matSlots: Slot[] = SEGS.filter((s) => CENSOR && s.freezeSec === undefined)
 			reason: `мат «${w.text.toLowerCase()}»`,
 			from: at(s.id, w.start),
 			durationInFrames: Math.max(Math.round(((w.end - w.start) / s.rate) * FPS), 12),
-			volumeDb: -4,
+			relDb: -2,
 		})),
 );
 
@@ -199,7 +200,7 @@ export const SLOTS: Slot[] = [
 		reason: 'стоп-кадр после «я испугался»',
 		from: segStart('freeze'),
 		durationInFrames: segLen(segById('freeze')),
-		volumeDb: -6,
+		relDb: -3,
 	},
 ];
 

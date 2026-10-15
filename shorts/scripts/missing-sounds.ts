@@ -12,7 +12,7 @@ const tc = (f: number) => {
 const missing = SLOTS.filter((s) => !available.includes(s.expectedFile));
 const rows = missing.map(
 	(s, i) =>
-		`| ${i + 1} | ${tc(s.from)} | ${(s.durationInFrames / FPS).toFixed(2).replace('.', ',')} сек | ${s.description} | ${s.reason} | assets/${s.expectedFile} | ${s.volumeDb} dB |`,
+		`| ${i + 1} | ${tc(s.from)} | ${(s.durationInFrames / FPS).toFixed(2).replace('.', ',')} сек | ${s.description} | ${s.reason} | assets/${s.expectedFile} | ${s.relDb} dB от пиков голоса |`,
 );
 const md = [
 	`# Пустые места под звуки — ${path.basename(outBase)}`,

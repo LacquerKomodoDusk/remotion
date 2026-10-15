@@ -1,0 +1,26 @@
+{
+ "voicePeakDb": -26.55,
+ "assets": {
+  "generated/bass_drop_01.wav": -4.59,
+  "generated/bass_drop_02.wav": -4.38,
+  "generated/ding_01.wav": -8.23,
+  "generated/ding_02.wav": -8.38,
+  "generated/glitch_01.wav": -16.5,
+  "generated/glitch_02.wav": -12.8,
+  "generated/glitch_03.wav": -14.53,
+  "generated/impact_02.wav": -8.9,
+  "generated/impact_03.wav": -11.59,
+  "generated/impact_heavy_01.wav": -6.3,
+  "generated/pop_02.wav": -13.0,
+  "generated/pop_03.wav": -12.53,
+  "generated/pop_soft_01.wav": -12.79,
+  "generated/riser_01.wav": -13.02,
+  "generated/riser_02.wav": -14.68,
+  "generated/scratch_01.wav": -10.59,
+  "generated/tick_01.wav": -13.35,
+  "generated/tick_02.wav": -13.52,
+  "generated/whoosh_01.wav": -12.35,
+  "generated/whoosh_02.wav": -12.61,
+  "generated/whoosh_03.wav": -12.14
+ }
+}
