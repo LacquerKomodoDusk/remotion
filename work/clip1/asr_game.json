@@ -1,0 +1,16 @@
+{
+ "giga": {
+  "text": "",
+  "tokens": [],
+  "timestamps": []
+ },
+ "whisper": {
+  "text": "Они ушли",
+  "tokens": [
+   " Они",
+   " уш",
+   "ли"
+  ],
+  "timestamps": []
+ }
+}

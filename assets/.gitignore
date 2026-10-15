@@ -1,0 +1,2 @@
+# сгенерированные звуки воспроизводятся scripts/generate_sfx.py (фиксированный seed)
+generated/*.wav

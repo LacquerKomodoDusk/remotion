@@ -1,0 +1,96 @@
+{
+ "source": "source.mp4",
+ "engine": "GigaAM-v2 (таймкоды) + Whisper medium (сверка текста)",
+ "words": [
+  {
+   "word": "здорово",
+   "start": 8.68,
+   "end": 9.08,
+   "text": "Здарова,",
+   "mat": false,
+   "confidence": null,
+   "speaker": "streamer"
+  },
+  {
+   "word": "епта",
+   "start": 9.12,
+   "end": 9.52,
+   "text": "епта!",
+   "mat": true,
+   "confidence": null,
+   "speaker": "streamer"
+  },
+  {
+   "word": "нихуя",
+   "start": 11.44,
+   "end": 11.84,
+   "text": "Нихуя",
+   "mat": true,
+   "confidence": null,
+   "speaker": "streamer"
+  },
+  {
+   "word": "себе",
+   "start": 12.04,
+   "end": 12.32,
+   "text": "себе,",
+   "mat": false,
+   "confidence": null,
+   "speaker": "streamer"
+  },
+  {
+   "word": "блять",
+   "start": 12.4,
+   "end": 12.72,
+   "text": "блять!",
+   "mat": true,
+   "confidence": null,
+   "speaker": "streamer"
+  },
+  {
+   "word": "я",
+   "start": 13.2,
+   "end": 13.28,
+   "text": "Я",
+   "mat": false,
+   "confidence": null,
+   "speaker": "streamer"
+  },
+  {
+   "word": "испугался",
+   "start": 13.36,
+   "end": 14.0,
+   "text": "испугался",
+   "mat": false,
+   "confidence": null,
+   "speaker": "streamer"
+  },
+  {
+   "word": "нахуй",
+   "start": 14.04,
+   "end": 14.4,
+   "text": "нахуй!",
+   "mat": true,
+   "confidence": null,
+   "speaker": "streamer"
+  }
+ ],
+ "nonverbal": [
+  {
+   "start": 10.55,
+   "end": 11.2,
+   "type": "вскрик без слов",
+   "speaker": "streamer",
+   "needs_check": true
+  }
+ ],
+ "other_voices": [
+  {
+   "start": 1.5,
+   "end": 5.5,
+   "text": "неразборчиво («они вышли…» / «они вошли…»), тихо",
+   "speaker": "teammate?",
+   "used": false
+  }
+ ]
+}

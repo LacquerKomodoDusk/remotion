@@ -1,0 +1,8 @@
+# тяжёлое и медиа — не в git
+models/
+fonts/
+*.mp4
+*.wav
+*/frames/
+*/sep/
+*/demucs.log
