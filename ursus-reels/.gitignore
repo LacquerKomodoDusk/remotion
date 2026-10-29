@@ -1,0 +1,7 @@
+proj/node_modules
+proj/public/source.mp4
+work/mix_raw.f32
+work/mix_final.wav
+work/voice16k.wav
+out/*_video.mp4
+out/draft.mp4
