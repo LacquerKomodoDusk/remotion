@@ -1,0 +1,4 @@
+proj/node_modules
+proj/public/game.mp4
+work/*.wav
+out/video.mp4
