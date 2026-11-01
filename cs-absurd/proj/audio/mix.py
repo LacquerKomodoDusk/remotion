@@ -110,7 +110,12 @@ def rewind():
     w = whoosh(0.35, 0.35)[::-1].copy()
     t = np.arange(len(w)) / SR
     return (w + 0.4 * np.sin(2 * np.pi * (900 - 1500 * t) * t) * np.exp(-t * 4)).astype(np.float32)
-KIND = {'pop': pop_s, 'scratch': scratch, 'whoosh': lambda: whoosh(0.45, 0.3), 'rewind': rewind, 'thud': lambda: thump(0.5, 45, 120)}
+def tick():
+    t = np.arange(int(0.05 * SR)) / SR
+    return (np.sin(2 * np.pi * 2200 * t) * np.exp(-t * 120) + 0.5 * np.sin(2 * np.pi * 3300 * t) * np.exp(-t * 160)).astype(np.float32)
+def heart():
+    return np.concatenate([thump(0.16, 38, 30), np.zeros(int(0.1 * SR), np.float32), thump(0.2, 36, 22)])
+KIND = {'tick': tick, 'heart': heart, 'pop': pop_s, 'scratch': scratch, 'whoosh': lambda: whoosh(0.45, 0.3), 'rewind': rewind, 'thud': lambda: thump(0.5, 45, 120)}
 events = [(f, KIND[k](), k) for f, k in plan['sfx']]
 three_d = [(s['from'], s['to']) for s in plan['segments'] if s.get('freeze') or s.get('mute')]
 in3d = lambda f: any(a <= f < b for a, b in three_d)

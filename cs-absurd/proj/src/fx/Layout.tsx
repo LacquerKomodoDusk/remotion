@@ -6,15 +6,16 @@ const FACE: [number, number] = [552, 288];
 
 export type LayoutKind = 'split' | 'webcam-full' | 'game-full';
 
-export const Layout: React.FC<{video: string; kind: LayoutKind; src: number; zoom: number; focus: [number, number]; freeze: boolean}> = ({
+export const Layout: React.FC<{video: string; kind: LayoutKind; src: number; zoom: number; focus: [number, number]; freeze: boolean; rate: number}> = ({
 	video,
 	kind,
 	src,
 	zoom,
 	focus,
 	freeze,
+	rate,
 }) => {
-	const raw = <OffthreadVideo src={staticFile(video)} startFrom={Math.round(src * 30)} muted style={{width: 1080, height: 1920}} />;
+	const raw = <OffthreadVideo src={staticFile(video)} startFrom={Math.round(src * 30)} playbackRate={rate} muted style={{width: 1080, height: 1920}} />;
 	const v = freeze ? <Freeze frame={0}>{raw}</Freeze> : raw;
 	if (kind === 'webcam-full') {
 		const s = 2.15 * zoom;

@@ -6,9 +6,10 @@ import {Layout, LayoutKind} from './fx/Layout';
 import {Subtitles, Word} from './fx/Subtitles';
 import {Counters, CounterData, Summary} from './fx/Counters';
 import {DocPlates} from './fx/Doc';
-import {AllTalkHolo} from './three/AllTalkHolo';
-import {PodiumHolo} from './three/PodiumHolo';
-import {TacticalHolo} from './three/TacticalHolo';
+import {AllTalkDust} from './three/AllTalkDust';
+import {BesideDust} from './three/BesideDust';
+import {QueueDust} from './three/QueueDust';
+import {Freeze, OffthreadVideo, staticFile} from 'remotion';
 
 export type Segment = {
 	id: string;
@@ -21,7 +22,8 @@ export type Segment = {
 	focus?: number[];
 	freeze?: boolean;
 	tint?: 'bw' | 'replay' | 'redfade';
-	scene?: 'tactical' | 'podium' | 'alltalk';
+	scene?: 'alltalk' | 'beside' | 'queue';
+	rate?: number;
 	mute?: boolean;
 };
 export type Plan = {
@@ -35,6 +37,7 @@ export type Plan = {
 	flashes: number[][];
 	counters?: CounterData;
 	summary?: {from: number; rows: string[][]};
+	magnifiers?: {from: number; to: number; src: number; point: number[]; at: number[]; r: number; scale: number}[];
 };
 
 // source time shown at an output frame (frozen on stop-frames, held through 3D inserts)
@@ -96,13 +99,32 @@ const Tint: React.FC<{tint: Segment['tint']; len: number}> = ({tint, len}) => {
 const Shot: React.FC<{seg: Segment; video: string; plan: Plan}> = ({seg, video, plan}) => {
 	const t = useCurrentFrame();
 	if (seg.kind === '3d') {
-		return seg.scene === 'tactical' ? <TacticalHolo /> : seg.scene === 'alltalk' ? <AllTalkHolo /> : <PodiumHolo />;
+		return seg.scene === 'alltalk' ? <AllTalkDust /> : seg.scene === 'queue' ? <QueueDust /> : <BesideDust />;
 	}
 	return (
 		<>
-			<Layout video={video} kind={seg.kind} src={seg.src} zoom={zoomAt(seg.zoom, t)} focus={(seg.focus ?? [540, 1250]) as [number, number]} freeze={Boolean(seg.freeze)} />
+			<Layout video={video} kind={seg.kind} src={seg.src} zoom={zoomAt(seg.zoom, t)} focus={(seg.focus ?? [540, 1250]) as [number, number]} freeze={Boolean(seg.freeze)} rate={seg.rate ?? 1} />
 			<Tint tint={seg.tint} len={seg.len} />
 		</>
+	);
+};
+
+// round magnifying glass over a frozen detail of the frame (e.g. the ammo counter)
+const Magnifier: React.FC<{m: NonNullable<Plan['magnifiers']>[number]; video: string}> = ({m, video}) => {
+	const f = useCurrentFrame();
+	if (f < m.from || f >= m.to) {
+		return null;
+	}
+	const a = interpolate(f, [m.from, m.from + 6], [0, 1], clamp);
+	const s = m.scale;
+	return (
+		<div style={{position: 'absolute', left: m.at[0] - m.r, top: m.at[1] - m.r, width: m.r * 2, height: m.r * 2, borderRadius: '50%', overflow: 'hidden', border: `10px solid #fff`, boxShadow: '0 20px 60px rgba(0,0,0,0.6)', transform: `scale(${a})`}}>
+			<div style={{position: 'absolute', left: m.r - m.point[0] * s, top: m.r - m.point[1] * s, width: 1080, height: 1920, transform: `scale(${s})`, transformOrigin: '0 0'}}>
+				<Freeze frame={0}>
+					<OffthreadVideo src={staticFile(video)} startFrom={Math.round(m.src * 30)} muted style={{width: 1080, height: 1920}} />
+				</Freeze>
+			</div>
+		</div>
 	);
 };
 
@@ -124,6 +146,11 @@ export const Main: React.FC<{plan: Plan; video: string}> = ({plan, video}) => {
 					</Sequence>
 				))}
 			</AbsoluteFill>
+			{(plan.magnifiers ?? []).map((m) => (
+				<Sequence key={m.from} from={0}>
+					<Magnifier m={m} video={video} />
+				</Sequence>
+			))}
 			{plan.flashes.map(([at, len]) => (
 				<Flash key={at} at={at} len={len} />
 			))}
