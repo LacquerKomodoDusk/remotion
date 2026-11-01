@@ -1,0 +1,65 @@
+[
+ {
+  "frame": 30,
+  "end": 33.6,
+  "sfx": "pop",
+  "orig_st_db": -19.5,
+  "sfx_db": -25.8
+ },
+ {
+  "frame": 108,
+  "end": 111.6,
+  "sfx": "pop",
+  "orig_st_db": -27.9,
+  "sfx_db": -38.9
+ },
+ {
+  "frame": 249,
+  "end": 252.6,
+  "sfx": "pop",
+  "orig_st_db": -22.0,
+  "sfx_db": -26.5
+ },
+ {
+  "frame": 300,
+  "end": 310.5,
+  "sfx": "scratch",
+  "orig_st_db": -180.0,
+  "sfx_db": -43.3
+ },
+ {
+  "frame": 318,
+  "end": 331.5,
+  "sfx": "whoosh",
+  "orig_st_db": -180.0,
+  "sfx_db": -28.1
+ },
+ {
+  "frame": 438,
+  "end": 451.5,
+  "sfx": "whoosh",
+  "orig_st_db": -33.2,
+  "sfx_db": -44.9
+ },
+ {
+  "frame": 477,
+  "end": 480.6,
+  "sfx": "pop",
+  "orig_st_db": -37.1,
+  "sfx_db": -41.7
+ },
+ {
+  "frame": 555,
+  "end": 570.0,
+  "sfx": "thud",
+  "orig_st_db": -23.8,
+  "sfx_db": -30.2
+ },
+ {
+  "frame": 615,
+  "end": 628.5,
+  "sfx": "whoosh",
+  "orig_st_db": -50.2,
+  "sfx_db": -59.9
+ }
+]
