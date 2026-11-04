@@ -2,9 +2,7 @@
 HK, HF, RW, FI, DE, DF, BA, CO, RE, DR, LA, TA = (seg[x] for x in ['hook', 'hook_fz', 'rewind', 'fight', 'death', 'death_fz', 'banner', 'count', 'react', 'drop', 'last', 'tail'])
 
 # --- ХУК ---
-E(type='flash', f=0, dur=6, amt=0.8)
-E(type='title', f=2, dur=HF['end'] - 2, lines=['ПРОИГРАЛ', 'БОТУ?!'], accent=1, y=790)
-E(type='letterbox', f=0, dur=HF['end'])
+E(type='title', f=2, dur=HF['end'] - 2, lines=['ПРОИГРАЛ', 'БОТУ?!'], accent=1, y=960)
 S('riser', 0, 0.45, dur=HF['start'] / FPS)
 hit(HF['start'], 1.0)
 E(type='leak', f=HF['start'], dur=40, hue=0)
@@ -30,7 +28,6 @@ while f < FI['end']:
 E(type='label', f=at('fight', 2.45), dur=at('fight', 3.4) - at('fight', 2.45), text='СТРОИТ КАК ПРО', target='game', top=1420)
 S('pop', at('fight', 2.45), 0.4)
 # --- СМЕРТЬ ---
-E(type='letterbox', f=at('death', 6.95), dur=DF['end'] - at('death', 6.95) + 6)
 S('riser', at('death', 6.9), 0.7, dur=(DF['start'] - at('death', 6.9)) / FPS)
 E(type='zoomin', f=at('death', 6.95), end=DF['start'], amt=0.1)
 hit(DF['start'], 1.2)
@@ -42,7 +39,7 @@ E(type='zoomin', f=fb, end=fb + 120, amt=0.35, ox=482, oy=860)
 E(type='punch', f=fb, amt=0.06); S('pop', fb, 0.5)
 E(type='label', f=fb + 24, dur=BA['end'] - fb - 24, text='TYPOWY BOCIK —\nс польского «ТИПИЧНЫЙ БОТИК»', target='cam', top=1150, size=46)
 S('pop', fb + 24, 0.4)
-E(type='word', f=fb + 95, dur=BA['end'] - fb - 95, text='БУКВАЛЬНО.', y=640, x=0, accent=1)
+E(type='word', f=fb + 95, dur=BA['end'] - fb - 95, text='БУКВАЛЬНО.', y=1450, x=0, accent=1)
 hit(fb + 95, 0.6)
 # --- ОТСЧЁТ ---
 for i, t in enumerate([9.85, 10.45, 11.0]):
@@ -58,12 +55,13 @@ E(type='glitch', f=DR['start'], dur=8); S('whoosh', DR['start'] - 4, 0.9)
 E(type='flash', f=DR['start'], dur=10, amt=0.7)
 # --- ПОСЛЕДНЯЯ ЖИЗНЬ ---
 E(type='zoomin', f=LA['start'], end=LA['end'], amt=0.3, ox=471, oy=1440)
-E(type='letterbox', f=LA['start'], dur=LA['end'] - LA['start'] + 4)
 hit(LA['start'] + 6, 0.8)
-E(type='title', f=LA['start'] + 14, dur=LA['end'] - LA['start'] + 50, lines=['ЭТО БЫЛА', 'ПОСЛЕДНЯЯ ЖИЗНЬ'], accent=1, y=560)
+E(type='title', f=LA['start'] + 14, dur=LA['end'] - LA['start'] + 4, lines=['ЭТО БЫЛА', 'ПОСЛЕДНЯЯ ЖИЗНЬ'], accent=1, y=560)
 S('powerdown', LA['start'] + 20, 0.5)
 
 # --- ХВОСТ / ЛУП ---
 S('whoosh', TA['start'] - 4, 0.6)
-E(type='whiteout', f=N - 7, dur=7)
-S('impact', N - 6, 0.8); S('riser', N - 50, 0.4, dur=44 / FPS)
+E(type='label', f=TA['start'] + 4, dur=TA['end'] - TA['start'] - 10, text='ТИПИЧНЫЙ БОТИК: 1\nСТРИМЕР: 0', target='cam', top=560, size=48)
+S('pop', TA['start'] + 4, 0.5)
+E(type='glitch', f=N - 8, dur=8); E(type='ca', f=N - 8, dur=8, amt=14)  # жёсткий стык лупа в начало
+S('whoosh', N - 10, 0.8)

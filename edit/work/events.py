@@ -2,9 +2,7 @@
 H, HF, RW, DA, DV, DF, OU, AF, KI, SK, HE = (seg[x] for x in ['hook', 'hook_fz', 'rewind', 'dance', 'dive', 'dive_fz', 'out', 'after', 'kick', 'skip', 'heal'])
 
 # --- ХУК ---
-E(type='flash', f=0, dur=6, amt=0.8)  # выход из белого (луп)
 E(type='title', f=2, dur=HF['end'] - 2, lines=['ОН ПРОДЕРЖАЛСЯ', '5 СЕКУНД'], accent=1, y=790)
-E(type='letterbox', f=0, dur=HF['end'])
 S('riser', 0, 0.5, dur=(HF['start']) / FPS)
 hit(HF['start'], 1.0)
 E(type='leak', f=HF['start'], dur=40, hue=0)
@@ -36,7 +34,6 @@ for f in range(DA['start'] + 1, DA['end']):
     if abs(SP[f - 1]) < 1.4 <= abs(SP[f]):
         S('whoosh', f - 4, 0.35)
 # --- НЫРОК ---
-E(type='letterbox', f=at('dive', 6.35), dur=DF['end'] - at('dive', 6.35) + 6)
 S('riser', at('dive', 6.25), 0.7, dur=(DF['start'] - at('dive', 6.25)) / FPS)
 E(type='word', f=at('dive', 6.30), dur=DF['end'] - at('dive', 6.30) + 20, text='ВСЁ.', y=700, x=0, accent=0)
 E(type='word', f=at('dive', 6.68), dur=DF['end'] - at('dive', 6.68) + 20, text='ХВАТИТ.', y=860, x=0, accent=1)
@@ -56,10 +53,9 @@ E(type='leak', f=fmin - 20, dur=50, hue=2); E(type='zoomin', f=fmin - 30, end=fm
 # --- МАХ НОГОЙ (game_full) ---
 S('whoosh', KI['start'] - 8, 0.8)
 E(type='flash', f=KI['start'], dur=8, amt=0.5)
-E(type='title', f=KI['start'] + 6, dur=KI['end'] - KI['start'] - 6, lines=['ОНА:', 'ЕЩЁ РАЗОК?'], accent=1, y=420)
+E(type='title', f=KI['start'] + 6, dur=KI['end'] - KI['start'] - 6, lines=['ОНА:', 'ЕЩЁ РАЗОК?'], accent=1, y=1330)
 fk = at('kick', 14.05)
 E(type='punch', f=fk, amt=0.1); E(type='ca', f=fk, dur=8, amt=6); S('impact', fk, 0.45); E(type='leak', f=fk, dur=40, hue=0)
-E(type='letterbox', f=KI['start'] + 10, dur=KI['end'] - KI['start'] - 10)
 # --- ПРОБРОС ---
 S('whoosh', SK['start'] + 6, 0.8)
 E(type='glitch', f=SK['start'] + 10, dur=8)
@@ -68,6 +64,6 @@ E(type='stamina', f=HE['start'] + 10, end=HE['end'] - 75)
 S('heal', HE['start'] + 10, 0.55, dur=(HE['end'] - 75 - HE['start'] - 10) / FPS)
 S('chime', HE['end'] - 75, 0.6)
 E(type='zoomin', f=HE['start'], end=HE['end'], amt=0.08)
-E(type='whiteout', f=N - 7, dur=7)
-S('impact', N - 6, 0.8); S('riser', N - 50, 0.4, dur=44 / FPS)
+E(type='glitch', f=N - 8, dur=8); E(type='ca', f=N - 8, dur=8, amt=14)  # жёсткий стык лупа в начало
+S('whoosh', N - 10, 0.8)
 

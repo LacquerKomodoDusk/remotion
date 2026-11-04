@@ -48,7 +48,7 @@ const LAYOUTS: Record<string, {cam: Win; game: Win}> = {
 		game: {x: 0, y: 0, w: 1080, h: 1920, cx: 412, cy: 1130, s: 1.92, r: 0, blur: 0, dim: 1},
 	},
 	cam_full: {
-		cam: {x: 50, y: 230, w: 980, h: 920, ...CAM, cx: 552, cy: 250, s: 2.1, r: 44, blur: 0, dim: 1},
+		cam: {x: 50, y: 200, w: 980, h: 820, ...CAM, cx: 552, cy: 250, s: 2.1, r: 44, blur: 0, dim: 1},
 		game: {x: 0, y: 0, w: 1080, h: 1920, cx: 412, cy: 1130, s: 1.92, r: 0, blur: 22, dim: 0.42},
 	},
 };
@@ -159,7 +159,7 @@ const Word: React.FC<{e: Ev; f: number}> = ({e, f}) => {
 				style={{
 					display: 'inline-block',
 					fontFamily: HEAD,
-					fontSize: Math.min(136, 860 / (e.text.length * 0.68)),
+					fontSize: Math.min(136, 820 / (e.text.length * 0.8)),
 					fontStyle: 'italic',
 					color: e.accent ? C.yellow : C.white,
 					WebkitTextStroke: '12px #12082a',
@@ -222,12 +222,12 @@ const Meter: React.FC<{e: Ev; f: number}> = ({e, f}) => {
 	const col = lost ? '#ff3b3b' : v > 80 ? C.yellow : C.cyan;
 	const jitter = lost && lostT < 30 ? noise1('j', f) * 10 : 0;
 	return (
-		<div style={{position: 'absolute', left: 70, width: 790, top: 232, zIndex: 60, opacity: Math.min(1, appear) * outro, transform: `translate(${jitter}px, ${(1 - appear) * -40}px)`}}>
-			<div style={{display: 'flex', justifyContent: 'space-between', fontFamily: UI, fontWeight: 900, fontSize: 40, color: C.white, textShadow: '0 4px 0 #12082a', marginBottom: 10, letterSpacing: 1}}>
+		<div style={{position: 'absolute', left: 70, width: 790, top: 240, zIndex: 60, opacity: Math.min(1, appear) * outro, transform: `translate(${jitter}px, ${(1 - appear) * -40}px)`}}>
+			<div style={{display: 'flex', justifyContent: 'space-between', fontFamily: UI, fontWeight: 900, fontSize: 52, color: C.white, textShadow: '0 4px 0 #12082a', marginBottom: 10, letterSpacing: 1}}>
 				<span>{lost ? e.lostLabel ?? 'СИНХРОН ПОТЕРЯН' : e.label ?? 'СИНХРОН СО СКИНОМ'}</span>
 				<span style={{color: col}}>{Math.round(v)}%</span>
 			</div>
-			<div style={{height: 34, borderRadius: 10, background: 'rgba(20,11,46,0.85)', border: '4px solid #12082a', overflow: 'hidden', position: 'relative', transform: 'skewX(-12deg)'}}>
+			<div style={{height: 46, borderRadius: 10, background: 'rgba(20,11,46,0.85)', border: '4px solid #12082a', overflow: 'hidden', position: 'relative', transform: 'skewX(-12deg)'}}>
 				<div style={{position: 'absolute', left: 0, top: 0, bottom: 0, width: `${v}%`, background: `linear-gradient(90deg, ${C.purple}, ${col})`, boxShadow: `0 0 24px ${col}`}} />
 				{[...Array(9)].map((_, i) => (
 					<div key={i} style={{position: 'absolute', left: `${(i + 1) * 10}%`, top: 0, bottom: 0, width: 4, background: 'rgba(18,8,42,0.6)'}} />
@@ -246,7 +246,7 @@ const Stamina: React.FC<{e: Ev; f: number}> = ({e, f}) => {
 	const pop = done ? spring({frame: f - e.end, fps: 60, config: {damping: 8, stiffness: 240}}) : 0;
 	const col = v < 40 ? '#ff4d4d' : v < 80 ? C.yellow : '#56ff7a';
 	return (
-		<div style={{position: 'absolute', left: 90, width: 760, top: 1180, zIndex: 60, opacity: Math.min(1, appear), transform: `translateY(${(1 - appear) * 60}px) scale(${1 + pop * 0.06 - (done ? 0.06 : 0)})`}}>
+		<div style={{position: 'absolute', left: 90, width: 760, top: 1060, zIndex: 60, opacity: Math.min(1, appear), transform: `translateY(${(1 - appear) * 60}px) scale(${1 + pop * 0.06 - (done ? 0.06 : 0)})`}}>
 			<div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', fontFamily: UI, fontWeight: 900, color: C.white, textShadow: '0 4px 0 #12082a', marginBottom: 10}}>
 				<span style={{fontSize: 44, whiteSpace: 'nowrap'}}>СТАМИНА</span>
 				<span style={{fontSize: 56, color: col, fontFamily: HEAD}}>{Math.round(v)}</span>
@@ -333,7 +333,7 @@ export const Edit: React.FC<{clip: string}> = ({clip}) => {
 	const sr = noise1('sr', f * 3) * shakeE * 0.06;
 	const glitch = active(f, 'glitch').length > 0;
 	const gj = glitch ? (random(`g${Math.floor(f / 2)}`) - 0.5) * 50 : 0;
-	const scale = 1 + punch + zoomIn + (shakeE > 0 ? 0.05 : 0) + Math.abs(tilt) * 0.012 + whip * 0.06;
+	const scale = 1 + punch + zoomIn + (shakeE > 0 || glitch ? 0.06 : 0) + Math.abs(tilt) * 0.012 + whip * 0.06;
 
 	// изображение
 	const ca = sumEnv(f, 'ca', 'amt', 1) + (glitch ? 10 + random(`c${f}`) * 12 : 0) + whip * 10;
