@@ -3,7 +3,7 @@ H, HF, RW, DA, DV, DF, OU, AF, KI, SK, HE = (seg[x] for x in ['hook', 'hook_fz',
 
 # --- ХУК ---
 E(type='flash', f=0, dur=6, amt=0.8)  # выход из белого (луп)
-E(type='title', f=2, dur=HF['end'] - 2, lines=['ОН ПРОДЕРЖАЛСЯ', '5 СЕКУНД'], accent=1, y=880)
+E(type='title', f=2, dur=HF['end'] - 2, lines=['ОН ПРОДЕРЖАЛСЯ', '5 СЕКУНД'], accent=1, y=790)
 E(type='letterbox', f=0, dur=HF['end'])
 S('riser', 0, 0.5, dur=(HF['start']) / FPS)
 hit(HF['start'], 1.0)
@@ -16,14 +16,19 @@ S('rewind', RW['start'], 0.8, dur=(RW['end'] - RW['start']) / FPS)
 E(type='flash', f=DA['start'], dur=8, amt=0.7)
 E(type='punch', f=DA['start'], amt=0.14)
 S('whoosh', DA['start'] - 6, 0.6)
-E(type='title', f=DA['start'] + 4, dur=95, lines=['ПОВТОРЯЮ', 'ЗА СКИНОМ'], accent=1, y=880)
-E(type='meter', f=DA['start'] + 10, end=DF['start'], lost=DF['start'], hide=OU['end'] + 40)
+E(type='title', f=DA['start'] + 4, dur=80, lines=['ПОВТОРЯЮ', 'ЗА СКИНОМ'], accent=1, y=790)
+# эскалация усталости — новое событие каждые ~1 с
+for k, (u, txt) in enumerate([(0.35, 'ДВИЖЕНИЯ: 1 В 1'), (0.6, 'ДЫХАЛКА: 50%'), (0.85, 'ДЫХАЛКА: 5%')]):
+    fu = DA['start'] + int((DA['end'] - DA['start']) * u)
+    nxt = DA['start'] + int((DA['end'] - DA['start']) * [0.6, 0.85, 1.0][k])
+    E(type='label', f=fu, dur=nxt - fu, text=txt, target='game', top=1400); S('pop', fu, 0.45); E(type='punch', f=fu, amt=0.05)
+E(type='meter', f=DA['start'] + 10, end=at('dive', 6.25), lost=at('dive', 6.30), hide=OU['end'] + 40)
 bi = 0
 for b in beats:
     if 1.3 < b < 5.95:
         f = at('dance', b); s = abs(SP[f])
         if s < 0.6:  # слоумо-провал на бите: мягкий свет + саб
-            E(type='leak', f=f - 6, dur=34, hue=bi % 3); S('boom', f, 0.5); E(type='punch', f=f, amt=0.07)
+            (E(type='leak', f=f - 6, dur=30, hue=2) if bi % 2 else None); S('boom', f, 0.5); E(type='punch', f=f, amt=0.07)
         elif bi % 2 == 0:
             E(type='punch', f=f, amt=0.06); E(type='pump', f=f, dur=8)
         bi += 1
@@ -33,13 +38,13 @@ for f in range(DA['start'] + 1, DA['end']):
 # --- НЫРОК ---
 E(type='letterbox', f=at('dive', 6.35), dur=DF['end'] - at('dive', 6.35) + 6)
 S('riser', at('dive', 6.25), 0.7, dur=(DF['start'] - at('dive', 6.25)) / FPS)
-E(type='word', f=at('dive', 6.30), dur=DF['end'] - at('dive', 6.30) + 20, text='ВСЁ.', y=770, x=0, accent=0)
-E(type='word', f=at('dive', 6.68), dur=DF['end'] - at('dive', 6.68) + 20, text='ХВАТИТ.', y=930, x=0, accent=1)
+E(type='word', f=at('dive', 6.30), dur=DF['end'] - at('dive', 6.30) + 20, text='ВСЁ.', y=700, x=0, accent=0)
+E(type='word', f=at('dive', 6.68), dur=DF['end'] - at('dive', 6.68) + 20, text='ХВАТИТ.', y=860, x=0, accent=1)
 S('pop', at('dive', 6.30), 0.5); S('pop', at('dive', 6.68), 0.5)
 E(type='zoomin', f=at('dive', 6.35), end=DF['start'], amt=0.12)
 hit(DF['start'], 1.2)
 E(type='leak', f=DF['start'], dur=50, hue=1)
-S('powerdown', DF['start'] + 4, 0.6)
+S('powerdown', at('dive', 6.32), 0.6)
 # --- РАЗГОН ---
 S('whoosh', OU['start'] + 4, 0.8)
 # --- ПОСЛЕ ---
@@ -51,7 +56,7 @@ E(type='leak', f=fmin - 20, dur=50, hue=2); E(type='zoomin', f=fmin - 30, end=fm
 # --- МАХ НОГОЙ (game_full) ---
 S('whoosh', KI['start'] - 8, 0.8)
 E(type='flash', f=KI['start'], dur=8, amt=0.5)
-E(type='title', f=KI['start'] + 6, dur=KI['end'] - KI['start'] - 6, lines=['А ОНА ТОЛЬКО', 'РАЗОГРЕЛАСЬ'], accent=1, y=420)
+E(type='title', f=KI['start'] + 6, dur=KI['end'] - KI['start'] - 6, lines=['ОНА:', 'ЕЩЁ РАЗОК?'], accent=1, y=420)
 fk = at('kick', 14.05)
 E(type='punch', f=fk, amt=0.1); E(type='ca', f=fk, dur=8, amt=6); S('impact', fk, 0.45); E(type='leak', f=fk, dur=40, hue=0)
 E(type='letterbox', f=KI['start'] + 10, dur=KI['end'] - KI['start'] - 10)

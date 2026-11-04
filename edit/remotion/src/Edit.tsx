@@ -26,8 +26,8 @@ const LEAKS = [
 
 type Ev = {type: string; f: number; dur?: number; end?: number; [k: string]: any};
 const CLIPS: Record<string, {data: any; video: string; gameCy: number}> = {
-	a: {data: dataA, video: 'master.mp4', gameCy: 1095},
-	b: {data: dataB, video: 'master2.mp4', gameCy: 1000},
+	a: {data: dataA, video: 'master.mp4', gameCy: 1125},
+	b: {data: dataB, video: 'master2.mp4', gameCy: 1030},
 };
 let data: any = dataA;
 let EV: Ev[] = dataA.events as Ev[];
@@ -40,15 +40,15 @@ type Win = {x: number; y: number; w: number; h: number; cx: number; cy: number; 
 const CAM = {cx: 550, cy: 258};
 const LAYOUTS: Record<string, {cam: Win; game: Win}> = {
 	split: {
-		cam: {x: 0, y: 0, w: 1080, h: 850, ...CAM, s: 1.9, r: 0, blur: 0, dim: 1},
-		game: {x: 0, y: 850, w: 1080, h: 1070, cx: 459, cy: -1, s: 1.176, r: 0, blur: 0, dim: 1},
+		cam: {x: 0, y: 0, w: 1080, h: 780, cx: 550, cy: 213, s: 2.2, r: 0, blur: 0, dim: 1},
+		game: {x: 0, y: 780, w: 1080, h: 1140, cx: 459, cy: -1, s: 1.176, r: 0, blur: 0, dim: 1},
 	},
 	game_full: {
-		cam: {x: 0, y: -900, w: 1080, h: 850, ...CAM, s: 1.9, r: 0, blur: 0, dim: 1},
+		cam: {x: 0, y: -820, w: 1080, h: 780, cx: 550, cy: 213, s: 2.2, r: 0, blur: 0, dim: 1},
 		game: {x: 0, y: 0, w: 1080, h: 1920, cx: 412, cy: 1130, s: 1.92, r: 0, blur: 0, dim: 1},
 	},
 	cam_full: {
-		cam: {x: 50, y: 330, w: 980, h: 920, ...CAM, cx: 552, cy: 250, s: 2.1, r: 44, blur: 0, dim: 1},
+		cam: {x: 50, y: 230, w: 980, h: 920, ...CAM, cx: 552, cy: 250, s: 2.1, r: 44, blur: 0, dim: 1},
 		game: {x: 0, y: 0, w: 1080, h: 1920, cx: 412, cy: 1130, s: 1.92, r: 0, blur: 22, dim: 0.42},
 	},
 };
@@ -179,7 +179,7 @@ const Label: React.FC<{e: Ev; f: number}> = ({e, f}) => {
 	const t = f - e.f;
 	const sp = spring({frame: t, fps: 60, config: {damping: 13, stiffness: 200}});
 	const out = interpolate(t, [e.dur - 6, e.dur], [1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
-	const top = e.top ?? (e.target === 'cam' ? 640 : 1400);
+	const top = e.top ?? (e.target === 'cam' ? 600 : 1400);
 	return (
 		<div style={{position: 'absolute', left: 0, width: 930, top, display: 'flex', justifyContent: 'center', zIndex: 45, opacity: out}}>
 			<div
@@ -197,7 +197,8 @@ const Label: React.FC<{e: Ev; f: number}> = ({e, f}) => {
 					background: 'rgba(20,11,46,0.88)',
 					border: `5px solid ${e.target === 'cam' ? C.pink : C.cyan}`,
 					boxShadow: `0 0 30px ${e.target === 'cam' ? 'rgba(255,61,165,0.6)' : 'rgba(79,243,255,0.6)'}`,
-					transform: `translateX(${(1 - sp) * (e.target === 'cam' ? -700 : 700)}px) rotate(${e.target === 'cam' ? -2 : 2}deg)`,
+					transform: `scale(${0.3 + 0.7 * sp}) rotate(${(e.target === 'cam' ? -2 : 2) * sp}deg)`,
+					opacity: Math.min(1, sp * 2),
 				}}
 			>
 				{e.text}
@@ -221,7 +222,7 @@ const Meter: React.FC<{e: Ev; f: number}> = ({e, f}) => {
 	const col = lost ? '#ff3b3b' : v > 80 ? C.yellow : C.cyan;
 	const jitter = lost && lostT < 30 ? noise1('j', f) * 10 : 0;
 	return (
-		<div style={{position: 'absolute', left: 70, width: 790, top: 205, zIndex: 60, opacity: Math.min(1, appear) * outro, transform: `translate(${jitter}px, ${(1 - appear) * -40}px)`}}>
+		<div style={{position: 'absolute', left: 70, width: 790, top: 232, zIndex: 60, opacity: Math.min(1, appear) * outro, transform: `translate(${jitter}px, ${(1 - appear) * -40}px)`}}>
 			<div style={{display: 'flex', justifyContent: 'space-between', fontFamily: UI, fontWeight: 900, fontSize: 40, color: C.white, textShadow: '0 4px 0 #12082a', marginBottom: 10, letterSpacing: 1}}>
 				<span>{lost ? e.lostLabel ?? 'СИНХРОН ПОТЕРЯН' : e.label ?? 'СИНХРОН СО СКИНОМ'}</span>
 				<span style={{color: col}}>{Math.round(v)}%</span>
@@ -245,7 +246,7 @@ const Stamina: React.FC<{e: Ev; f: number}> = ({e, f}) => {
 	const pop = done ? spring({frame: f - e.end, fps: 60, config: {damping: 8, stiffness: 240}}) : 0;
 	const col = v < 40 ? '#ff4d4d' : v < 80 ? C.yellow : '#56ff7a';
 	return (
-		<div style={{position: 'absolute', left: 90, width: 760, top: 1290, zIndex: 60, opacity: Math.min(1, appear), transform: `translateY(${(1 - appear) * 60}px) scale(${1 + pop * 0.06 - (done ? 0.06 : 0)})`}}>
+		<div style={{position: 'absolute', left: 90, width: 760, top: 1180, zIndex: 60, opacity: Math.min(1, appear), transform: `translateY(${(1 - appear) * 60}px) scale(${1 + pop * 0.06 - (done ? 0.06 : 0)})`}}>
 			<div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', fontFamily: UI, fontWeight: 900, color: C.white, textShadow: '0 4px 0 #12082a', marginBottom: 10}}>
 				<span style={{fontSize: 44, whiteSpace: 'nowrap'}}>СТАМИНА</span>
 				<span style={{fontSize: 56, color: col, fontFamily: HEAD}}>{Math.round(v)}</span>
@@ -270,7 +271,7 @@ const Rewind: React.FC<{e: Ev; f: number}> = ({e, f}) => {
 		<AbsoluteFill style={{zIndex: 70, pointerEvents: 'none'}}>
 			<AbsoluteFill style={{background: 'repeating-linear-gradient(0deg, rgba(0,0,0,0.22) 0px, rgba(0,0,0,0.22) 3px, transparent 3px, transparent 7px)'}} />
 			<AbsoluteFill style={{background: 'rgba(91,63,217,0.18)', mixBlendMode: 'screen'}} />
-			<div style={{position: 'absolute', left: 0, right: 150, top: 790, textAlign: 'center', whiteSpace: 'nowrap', fontFamily: UI, fontWeight: 900, fontSize: 72, color: C.white, textShadow: `4px 0 0 ${C.pink}, -4px 0 0 ${C.cyan}`, opacity: blink ? 1 : 0.75}}>
+			<div style={{position: 'absolute', left: 0, right: 150, top: 720, textAlign: 'center', whiteSpace: 'nowrap', fontFamily: UI, fontWeight: 900, fontSize: 72, color: C.white, textShadow: `4px 0 0 ${C.pink}, -4px 0 0 ${C.cyan}`, opacity: blink ? 1 : 0.75}}>
 				{e.text ?? '◀◀ 5 СЕКУНД НАЗАД'}
 			</div>
 		</AbsoluteFill>
