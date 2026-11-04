@@ -1,0 +1,10 @@
+node_modules/
+*.mp4
+*.wav
+*.raw
+*.png
+*.jpg
+*.ttf
+work/interp/
+work/frames/
+work/stills/

@@ -3,7 +3,7 @@ frame blending на разгонах. Пишет work/retimed_master.mp4 (918x16
 import json, subprocess, glob, os, sys
 import numpy as np, cv2
 
-ROOT = '/home/user/remotion/edit'
+ROOT = sys.argv[1] if len(sys.argv) > 1 else "/home/user/remotion/edit"
 FPS = 60
 edl = json.load(open(f'{ROOT}/work/edl.json'))
 
@@ -12,9 +12,10 @@ src = []
 while True:
     ok, f = cap.read()
     if not ok: break
-    src.append(f)
-src = np.stack(src)
-NS, H, W = src.shape[:3]
+    src.append(cv2.imencode('.jpg', f, [cv2.IMWRITE_JPEG_QUALITY, 98])[1])
+NS = len(src)
+H, W = f.shape[:2] if False else cv2.imdecode(src[0], 1).shape[:2]
+_cache = {}
 print('source frames', NS, W, H, file=sys.stderr)
 
 interp = []
@@ -48,7 +49,11 @@ def interp_frame(t):
     return None
 
 def src_frame(t):
-    return src[min(max(int(round(t * FPS)), 0), NS - 1)]
+    i = min(max(int(round(t * FPS)), 0), NS - 1)
+    if i not in _cache:
+        if len(_cache) > 40: _cache.pop(next(iter(_cache)))
+        _cache[i] = cv2.imdecode(src[i], 1)
+    return _cache[i]
 
 def blended(t, sp, direction):
     n = int(min(max(round(sp * 0.75), 3), 6))

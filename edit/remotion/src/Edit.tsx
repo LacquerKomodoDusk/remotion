@@ -1,7 +1,8 @@
 import React from 'react';
-import {AbsoluteFill, Easing, interpolate, OffthreadVideo, random, spring, staticFile, useCurrentFrame} from 'remotion';
+import {AbsoluteFill, Easing, Img, interpolate, OffthreadVideo, random, spring, staticFile, useCurrentFrame} from 'remotion';
 import {loadFont} from '@remotion/fonts';
-import data from './data.json';
+import dataA from './data.json';
+import dataB from './data2.json';
 
 const HEAD = 'Russo One';
 const UI = 'Rubik';
@@ -24,17 +25,23 @@ const LEAKS = [
 ];
 
 type Ev = {type: string; f: number; dur?: number; end?: number; [k: string]: any};
-const EV = data.events as Ev[];
+const CLIPS: Record<string, {data: any; video: string; gameCy: number}> = {
+	a: {data: dataA, video: 'master.mp4', gameCy: 1095},
+	b: {data: dataB, video: 'master2.mp4', gameCy: 1000},
+};
+let data: any = dataA;
+let EV: Ev[] = dataA.events as Ev[];
+let VIDEO = staticFile('master.mp4');
+let GAME_CY = 1095;
 const SRC_W = 918;
 const SRC_H = 1632;
-const VIDEO = staticFile('master.mp4');
 
 type Win = {x: number; y: number; w: number; h: number; cx: number; cy: number; s: number; r: number; blur: number; dim: number};
 const CAM = {cx: 550, cy: 258};
 const LAYOUTS: Record<string, {cam: Win; game: Win}> = {
 	split: {
 		cam: {x: 0, y: 0, w: 1080, h: 850, ...CAM, s: 1.9, r: 0, blur: 0, dim: 1},
-		game: {x: 0, y: 850, w: 1080, h: 1070, cx: 459, cy: 1095, s: 1.176, r: 0, blur: 0, dim: 1},
+		game: {x: 0, y: 850, w: 1080, h: 1070, cx: 459, cy: -1, s: 1.176, r: 0, blur: 0, dim: 1},
 	},
 	game_full: {
 		cam: {x: 0, y: -900, w: 1080, h: 850, ...CAM, s: 1.9, r: 0, blur: 0, dim: 1},
@@ -122,7 +129,7 @@ const Title: React.FC<{e: Ev; f: number}> = ({e, f}) => {
 						key={i}
 						style={{
 							fontFamily: HEAD,
-							fontSize: isAccent ? 118 : 84,
+							fontSize: Math.min(isAccent ? 118 : 84, 800 / (line.length * 0.66)),
 							lineHeight: 1.02,
 							color: isAccent ? C.yellow : C.white,
 							WebkitTextStroke: '10px #12082a',
@@ -152,7 +159,7 @@ const Word: React.FC<{e: Ev; f: number}> = ({e, f}) => {
 				style={{
 					display: 'inline-block',
 					fontFamily: HEAD,
-					fontSize: 136,
+					fontSize: Math.min(136, 860 / (e.text.length * 0.68)),
 					fontStyle: 'italic',
 					color: e.accent ? C.yellow : C.white,
 					WebkitTextStroke: '12px #12082a',
@@ -172,22 +179,25 @@ const Label: React.FC<{e: Ev; f: number}> = ({e, f}) => {
 	const t = f - e.f;
 	const sp = spring({frame: t, fps: 60, config: {damping: 13, stiffness: 200}});
 	const out = interpolate(t, [e.dur - 6, e.dur], [1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
-	const top = e.target === 'cam' ? 640 : 1400;
+	const top = e.top ?? (e.target === 'cam' ? 640 : 1400);
 	return (
 		<div style={{position: 'absolute', left: 0, width: 930, top, display: 'flex', justifyContent: 'center', zIndex: 45, opacity: out}}>
 			<div
 				style={{
 					fontFamily: UI,
 					fontWeight: 900,
-					fontSize: 50,
+					fontSize: e.size ?? 50,
 					color: C.white,
 					padding: '14px 30px',
+					maxWidth: 880,
+					textAlign: 'center',
+					lineHeight: 1.15,
+					whiteSpace: 'pre-line',
 					borderRadius: 18,
 					background: 'rgba(20,11,46,0.88)',
 					border: `5px solid ${e.target === 'cam' ? C.pink : C.cyan}`,
 					boxShadow: `0 0 30px ${e.target === 'cam' ? 'rgba(255,61,165,0.6)' : 'rgba(79,243,255,0.6)'}`,
 					transform: `translateX(${(1 - sp) * (e.target === 'cam' ? -700 : 700)}px) rotate(${e.target === 'cam' ? -2 : 2}deg)`,
-					whiteSpace: 'nowrap',
 				}}
 			>
 				{e.text}
@@ -213,7 +223,7 @@ const Meter: React.FC<{e: Ev; f: number}> = ({e, f}) => {
 	return (
 		<div style={{position: 'absolute', left: 70, width: 790, top: 205, zIndex: 60, opacity: Math.min(1, appear) * outro, transform: `translate(${jitter}px, ${(1 - appear) * -40}px)`}}>
 			<div style={{display: 'flex', justifyContent: 'space-between', fontFamily: UI, fontWeight: 900, fontSize: 40, color: C.white, textShadow: '0 4px 0 #12082a', marginBottom: 10, letterSpacing: 1}}>
-				<span>{lost ? 'СИНХРОН ПОТЕРЯН' : 'СИНХРОН СО СКИНОМ'}</span>
+				<span>{lost ? e.lostLabel ?? 'СИНХРОН ПОТЕРЯН' : e.label ?? 'СИНХРОН СО СКИНОМ'}</span>
 				<span style={{color: col}}>{Math.round(v)}%</span>
 			</div>
 			<div style={{height: 34, borderRadius: 10, background: 'rgba(20,11,46,0.85)', border: '4px solid #12082a', overflow: 'hidden', position: 'relative', transform: 'skewX(-12deg)'}}>
@@ -261,7 +271,7 @@ const Rewind: React.FC<{e: Ev; f: number}> = ({e, f}) => {
 			<AbsoluteFill style={{background: 'repeating-linear-gradient(0deg, rgba(0,0,0,0.22) 0px, rgba(0,0,0,0.22) 3px, transparent 3px, transparent 7px)'}} />
 			<AbsoluteFill style={{background: 'rgba(91,63,217,0.18)', mixBlendMode: 'screen'}} />
 			<div style={{position: 'absolute', left: 0, right: 150, top: 790, textAlign: 'center', whiteSpace: 'nowrap', fontFamily: UI, fontWeight: 900, fontSize: 72, color: C.white, textShadow: `4px 0 0 ${C.pink}, -4px 0 0 ${C.cyan}`, opacity: blink ? 1 : 0.75}}>
-				◀◀ 5 СЕКУНД НАЗАД
+				{e.text ?? '◀◀ 5 СЕКУНД НАЗАД'}
 			</div>
 		</AbsoluteFill>
 	);
@@ -283,16 +293,22 @@ const Leak: React.FC<{e: Ev; f: number}> = ({e, f}) => {
 	);
 };
 
-export const Edit: React.FC = () => {
+export const Edit: React.FC<{clip: string}> = ({clip}) => {
 	const f = useCurrentFrame();
-	const segs = data.segments;
+	const cfg = CLIPS[clip];
+	data = cfg.data;
+	EV = data.events as Ev[];
+	VIDEO = staticFile(cfg.video);
+	GAME_CY = cfg.gameCy;
+	const segs = data.segments as {id: string; layout: string; start: number; end: number}[];
 	const si = Math.max(0, segs.findIndex((s) => f >= s.start && f < s.end));
 	const seg = segs[si];
 	const prev = segs[Math.max(0, si - 1)];
 	const TR = 14;
 	const tr = seg.layout !== prev.layout ? easeIO(Math.min(1, (f - seg.start) / TR)) : 1;
-	const L0 = LAYOUTS[prev.layout];
-	const L1 = LAYOUTS[seg.layout];
+	const fixCy = (l: {cam: Win; game: Win}) => ({cam: l.cam, game: l.game.cy < 0 ? {...l.game, cy: GAME_CY} : l.game});
+	const L0 = fixCy(LAYOUTS[prev.layout]);
+	const L1 = fixCy(LAYOUTS[seg.layout]);
 	const cam = seg.layout !== prev.layout ? lerpWin(L0.cam, L1.cam, tr) : L1.cam;
 	const game = seg.layout !== prev.layout ? lerpWin(L0.game, L1.game, tr) : L1.game;
 	const whip = seg.layout !== prev.layout ? Math.sin(Math.PI * tr) : 0;
@@ -307,6 +323,8 @@ export const Edit: React.FC = () => {
 		const rel = interpolate(f, [e.end, e.end + 12], [1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.out(Easing.exp)});
 		return acc + (f < e.end ? t : rel) * e.amt;
 	}, 0);
+	const zo = EV.filter((e) => e.type === 'zoomin' && e.ox !== undefined && f >= e.f - 5 && f < e.end + 14)[0];
+	const origin = zo ? `${zo.ox}px ${zo.oy}px` : '50% 50%';
 	const shakeE = EV.filter((e) => e.type === 'shake').reduce((acc, e) => acc + envAt(f, e.f, e.dur, 0) * e.amp, 0);
 	const tilt = EV.filter((e) => e.type === 'tilt').reduce((acc, e) => acc + envAt(f, e.f, e.dur, 2) * e.deg, 0);
 	const sx = noise1('sx', f * 3) * shakeE;
@@ -345,6 +363,7 @@ export const Edit: React.FC = () => {
 				style={{
 					transform: `translate(${sx + gj}px, ${sy}px) rotate(${sr + tilt}deg) scale(${scale})`,
 					filter: ca > 0.5 ? 'url(#ca)' : undefined,
+					transformOrigin: origin,
 				}}
 			>
 				<Window w={game} filter={grade} zIndex={1} />
@@ -364,14 +383,8 @@ export const Edit: React.FC = () => {
 			{EV.filter((e) => e.type === 'meter').map((e, i) => <Meter key={i} e={e} f={f} />)}
 			{EV.filter((e) => e.type === 'stamina').map((e, i) => <Stamina key={i} e={e} f={f} />)}
 			{/* зерно */}
-			<AbsoluteFill style={{zIndex: 80, mixBlendMode: 'overlay', opacity: 0.22}}>
-				<svg width="1080" height="1920">
-					<filter id="grain">
-						<feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed={f % 17} stitchTiles="stitch" />
-						<feColorMatrix type="saturate" values="0" />
-					</filter>
-					<rect width="100%" height="100%" filter="url(#grain)" />
-				</svg>
+			<AbsoluteFill style={{zIndex: 80, mixBlendMode: 'overlay', opacity: 0.3}}>
+				<Img src={staticFile(`grain_${f % 8}.png`)} style={{width: 1080, height: 1920}} />
 			</AbsoluteFill>
 			<AbsoluteFill style={{background: '#fff', opacity: flash, mixBlendMode: 'screen', zIndex: 90}} />
 			<AbsoluteFill style={{background: '#fff', opacity: white, zIndex: 91}} />
