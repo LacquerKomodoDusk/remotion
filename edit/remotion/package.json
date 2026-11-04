@@ -1,0 +1,1 @@
+{"name":"twitch-edit","private":true,"type":"module","dependencies":{"@remotion/cli":"4.0.540","@remotion/fonts":"^4.0.540","@remotion/google-fonts":"4.0.540","react":"19.1.0","react-dom":"19.1.0","remotion":"4.0.540"},"devDependencies":{"@types/react":"19.1.0","typescript":"5.8.3"}}
