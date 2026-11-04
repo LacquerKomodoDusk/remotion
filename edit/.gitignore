@@ -8,3 +8,4 @@ node_modules/
 work/interp/
 work/frames/
 work/stills/
+*.log
