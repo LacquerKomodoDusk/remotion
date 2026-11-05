@@ -232,7 +232,7 @@ export const Main: React.FC = () => {
 					<Word w={cur} t={t} fps={fps} />
 				</div>
 			) : null}
-			<ChatCard t={t} words={chatWords} exit={subWords[0].s - 0.12} y={768} />
+			<ChatCard t={t} words={chatWords} exit={chatEnd - 0.05} y={768} />
 			<XpToast t={t} start={ev.toast} top={1150} />
 			{/* grade: vignette + grain (8 pre-rendered PNGs) */}
 			<AbsoluteFill style={{background: 'radial-gradient(ellipse at 50% 48%, rgba(0,0,0,0) 55%, rgba(5,8,25,0.38) 100%)'}} />
