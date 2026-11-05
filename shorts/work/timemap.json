@@ -1,42 +1,50 @@
 {
- "total": 8.258000000000001,
+ "total": 10.5960625,
  "segments": [
   {
-   "id": "A",
+   "id": "H",
    "out_in": 0.0,
-   "out_out": 1.9080625,
+   "out_out": 2.3380625,
+   "layout": "cam_full",
+   "src_in": 3.0,
+   "src_out": 5.4
+  },
+  {
+   "id": "A",
+   "out_in": 2.3380625,
+   "out_out": 4.246125,
    "layout": "split",
    "src_in": 15.1,
    "src_out": 17.05
   },
   {
    "id": "FRZ",
-   "out_in": 1.9080625,
-   "out_out": 2.1680625,
+   "out_in": 4.246125,
+   "out_out": 4.506125,
    "layout": "split",
    "src_in": 17.03,
    "src_out": 17.03
   },
   {
    "id": "E1",
-   "out_in": 2.1680625,
-   "out_out": 4.008083333333333,
+   "out_in": 4.506125,
+   "out_out": 6.346145833333333,
    "layout": "split",
    "src_in": 33.13,
    "src_out": 34.97
   },
   {
    "id": "E2",
-   "out_in": 4.008083333333333,
-   "out_out": 4.488104166666667,
+   "out_in": 6.346145833333333,
+   "out_out": 6.8261666666666665,
    "layout": "split",
    "src_in": 35.66,
    "src_out": 36.14
   },
   {
    "id": "F",
-   "out_in": 4.488104166666667,
-   "out_out": 8.258000000000001,
+   "out_in": 6.8261666666666665,
+   "out_out": 10.5960625,
    "layout": "cam_full",
    "src_in": 37.78,
    "src_out": 41.65

@@ -15,6 +15,7 @@ import data from './data.json';
 import {MicMute} from './MicMute';
 import {XpToast} from './XpToast';
 import {ChatCard} from './ChatCard';
+import {SilentDots} from './SilentDots';
 
 const FONT = 'Unbounded';
 loadFont({family: FONT, url: staticFile('fonts/Unbounded-Black.woff2'), weight: '900'});
@@ -51,7 +52,8 @@ const SUB_Y: Record<Layout, number> = {split: 768, cam_full: 1400, game_full: 47
 
 const segs = data.timemap.segments as {id: string; out_in: number; out_out: number; layout: Layout}[];
 const words = data.words as {text: string; s: number; e: number; emotion: string; flags: string[]}[];
-const chatEnd = segs[0].out_out;
+const segA = segs.find((x) => x.id === 'A')!;
+const chatEnd = segA.out_out;
 const chatWords = words.filter((w) => w.s < chatEnd).map((w) => ({...w, text: w.text.toLowerCase(), emotion: w.text === 'АХАХ' ? 'joy' : 'neutral'}));
 const subWords = words.filter((w) => w.s >= chatEnd);
 const ev = data.events as {shot: number; toast: number; realize: number; micro: number};
@@ -225,14 +227,15 @@ export const Main: React.FC = () => {
 			{L.to === 'game_full' && L.p > 0.95 ? null : (
 				<div style={{position: 'absolute', left: 0, width: 1080, top: cam.dst[1] + cam.dst[3] - 2, height: 26, background: 'linear-gradient(rgba(11,21,48,0.45), rgba(11,21,48,0))'}} />
 			)}
-			<MicMute t={t} start={chatWords[2].s - 0.04} slashAt={chatWords[3].s} exit={chatEnd} />
-			<MicMute t={t} start={ev.micro - 0.04} slashAt={ev.micro + 0.11} exit={seg('F').out_in} />
+			<MicMute t={t} start={0.12} slashAt={0.45} exit={chatEnd} px={lerp(L.from === 'cam_full' ? 185 : 245, L.to === 'cam_full' ? 185 : 245, L.p)} py={lerp(L.from === 'cam_full' ? 1060 : 470, L.to === 'cam_full' ? 1060 : 470, L.p)} />
+			<MicMute t={t} start={ev.micro - 0.04} slashAt={ev.micro + 0.11} exit={seg('F').out_in} px={245} py={470} />
 			{cur ? (
 				<div style={{position: 'absolute', left: 0, top: subY, width: 1080}}>
 					<Word w={cur} t={t} fps={fps} />
 				</div>
 			) : null}
-			<ChatCard t={t} words={chatWords} exit={chatEnd - 0.05} y={768} />
+			<SilentDots t={t} end={segA.out_in} y={SUB_Y.cam_full} />
+			<ChatCard t={t} start={segA.out_in} words={chatWords} exit={chatEnd - 0.05} y={768} />
 			<XpToast t={t} start={ev.toast} top={1150} />
 			{/* grade: vignette + grain (8 pre-rendered PNGs) */}
 			<AbsoluteFill style={{background: 'radial-gradient(ellipse at 50% 48%, rgba(0,0,0,0) 55%, rgba(5,8,25,0.38) 100%)'}} />

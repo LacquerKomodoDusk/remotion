@@ -9,9 +9,10 @@ const NAVY = '#0B1530';
 type W = {text: string; s: number; e: number; emotion: string};
 const EMO: Record<string, string> = {neutral: '#FFFFFF', panic: '#FFD23F', joy: '#7CFF6B'};
 
-export const ChatCard: React.FC<{t: number; words: W[]; exit: number; y: number}> = ({t, words, exit, y}) => {
+export const ChatCard: React.FC<{t: number; start: number; words: W[]; exit: number; y: number}> = ({t, start, words, exit, y}) => {
 	const {fps} = useVideoConfig();
-	const f = t * fps;
+	const f = (t - start) * fps;
+	if (f < 0) return null;
 	const ex = (t - exit) * fps;
 	if (ex > 14) return null;
 	const inP = spring({frame: f, fps, config: {damping: 13, stiffness: 200}});

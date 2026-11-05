@@ -17,7 +17,7 @@ const Outlined: React.FC<{geo: THREE.BufferGeometry; color: string; pos?: [numbe
 	</group>
 );
 
-export const MicMute: React.FC<{t: number; start: number; slashAt: number; exit: number}> = ({t, start, slashAt, exit}) => {
+export const MicMute: React.FC<{t: number; start: number; slashAt: number; exit: number; px: number; py: number}> = ({t, start, slashAt, exit, px, py}) => {
 	const {fps} = useVideoConfig();
 	const geos = useMemo(
 		() => ({
@@ -40,8 +40,6 @@ export const MicMute: React.FC<{t: number; start: number; slashAt: number; exit:
 	const rotY = interpolate(inP, [0, 1], [-2.6, 0.32]) + Math.sin(lf / 9) * 0.08;
 	const wob = Math.sin(lf / 5) * 0.06 * (1 - Math.min(1, lf / 40));
 	// screen anchor (px): left of the face, over the monitor in the background — never on the face
-	const px = 245;
-	const py = 470;
 	const U = 1920 / (2 * 10 * Math.tan((30 / 2) * (Math.PI / 180)));
 	const x = (px - 540) / U;
 	const y = (960 - py) / U;
