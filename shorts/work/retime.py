@@ -45,6 +45,8 @@ slow=[s for s in edl['segments'] if 'speed_curve' in s and min(v for _,v in s['s
 interp={}
 for s in edl['segments']:
   if 'speed_curve' in s and min(v for _,v in s['speed_curve'])<0.8:
+    pass
+  if s.get('id') in ('G2a','G2b'):
     a,b=s['src_in']-0.1,s['src_out']
     fn=f"work/interp/{s['id']}_240.mp4"
     if not os.path.exists(fn):

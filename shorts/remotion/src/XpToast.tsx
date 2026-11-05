@@ -13,7 +13,7 @@ const Star: React.FC<{x: number; y: number; s: number; r: number}> = ({x, y, s, 
 	</svg>
 );
 
-export const XpToast: React.FC<{t: number; start: number}> = ({t, start}) => {
+export const XpToast: React.FC<{t: number; start: number; top: number}> = ({t, start, top}) => {
 	const {fps} = useVideoConfig();
 	const lf = (t - start) * fps;
 	if (lf < 0) return null;
@@ -30,7 +30,7 @@ export const XpToast: React.FC<{t: number; start: number}> = ({t, start}) => {
 		{x: 860, y: 170, d: 17},
 	];
 	return (
-		<div style={{position: 'absolute', left: 110, top: 330, width: 790, transform: `translateX(${x}px) scale(${sc})`, transformOrigin: '50% 50%'}}>
+		<div style={{position: 'absolute', left: 110, top, width: 790, transform: `translateX(${x}px) scale(${sc})`, transformOrigin: '50% 50%'}}>
 			<div
 				style={{
 					position: 'relative',

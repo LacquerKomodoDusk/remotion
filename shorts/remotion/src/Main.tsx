@@ -47,7 +47,7 @@ const GAME: Record<Layout, {dst: Rect; src: Rect}> = {
 	cam_full: {dst: [0, 1266, 1080, 654], src: [0, 560, 720, 436]},
 	game_full: {dst: [0, 0, 1080, 1920], src: [110, 480, 382, 680]},
 };
-const SUB_Y: Record<Layout, number> = {split: 768, cam_full: 1266, game_full: 470};
+const SUB_Y: Record<Layout, number> = {split: 768, cam_full: 1400, game_full: 470};
 
 const segs = data.timemap.segments as {id: string; out_in: number; out_out: number; layout: Layout}[];
 const words = data.words as {text: string; s: number; e: number; emotion: string; flags: string[]}[];
@@ -192,8 +192,8 @@ export const Main: React.FC = () => {
 	if (t >= seg('G1').out_in) camZoom = 1;
 
 	// --- game camera: slow push to the target in slow-mo, shake on the shot
-	const g2 = seg('G2');
-	const gameZoom = t >= g2.out_in ? interpolate(t, [g2.out_in, g2.out_out], [1.0, 1.14], {easing: Easing.inOut(Easing.cubic)}) : 1;
+	const g2 = seg('G2a');
+	const gameZoom = t >= g2.out_in ? interpolate(t, [g2.out_in, seg('G2b').out_out], [1.0, 1.14], {easing: Easing.inOut(Easing.cubic)}) : 1;
 	const shotAmp = t >= ev.shot ? interpolate(t - ev.shot, [0, 0.5], [16, 3], {extrapolateRight: 'clamp'}) : 0;
 	const gShake: [number, number] = [noise(t * 1.7, 3) * shotAmp, noise(t * 1.7, 9) * shotAmp];
 
@@ -233,7 +233,7 @@ export const Main: React.FC = () => {
 				</div>
 			) : null}
 			<ChatCard t={t} words={chatWords} exit={subWords[0].s - 0.12} y={768} />
-			<XpToast t={t} start={ev.toast} />
+			<XpToast t={t} start={ev.toast} top={930} />
 			{/* grade: vignette + grain (8 pre-rendered PNGs) */}
 			<AbsoluteFill style={{background: 'radial-gradient(ellipse at 50% 48%, rgba(0,0,0,0) 55%, rgba(5,8,25,0.38) 100%)'}} />
 			<Img src={staticFile(`grain/${Math.floor(frame / 2) % 8}.png`)} style={{position: 'absolute', inset: 0, width: 1080, height: 1920, mixBlendMode: 'overlay'}} />
