@@ -17,7 +17,7 @@ const Outlined: React.FC<{geo: THREE.BufferGeometry; color: string; pos?: [numbe
 	</group>
 );
 
-export const MicMute: React.FC<{t: number; start: number; exit: number}> = ({t, start, exit}) => {
+export const MicMute: React.FC<{t: number; start: number; slashAt: number; exit: number}> = ({t, start, slashAt, exit}) => {
 	const {fps} = useVideoConfig();
 	const geos = useMemo(
 		() => ({
@@ -34,7 +34,7 @@ export const MicMute: React.FC<{t: number; start: number; exit: number}> = ({t, 
 	const ex = (t - exit) * fps;
 	if (lf < 0 || ex > 26) return null;
 	const inP = spring({frame: lf, fps, config: {damping: 10, stiffness: 170}});
-	const slashP = spring({frame: lf - 9, fps, config: {damping: 8, stiffness: 260}});
+	const slashP = spring({frame: (t - slashAt) * fps, fps, config: {damping: 8, stiffness: 260}});
 	const outP = ex > 0 ? interpolate(ex, [0, 22], [0, 1], {extrapolateRight: 'clamp'}) : 0;
 	const s = inP * (1 - outP) * 1.0;
 	const rotY = interpolate(inP, [0, 1], [-2.6, 0.32]) + Math.sin(lf / 9) * 0.08;

@@ -39,15 +39,15 @@ const SRC_H = 1280;
 // dst rect on the 1080x1920 canvas + src rect in the 720x1280 source, per layout
 const CAM: Record<Layout, {dst: Rect; src: Rect}> = {
 	split: {dst: [0, 0, 1080, 768], src: [222, 32, 422, 300]},
-	cam_full: {dst: [0, 330, 1080, 1116], src: [330, 34, 290, 300]},
+	cam_full: {dst: [0, 150, 1080, 1116], src: [330, 34, 290, 300]},
 	game_full: {dst: [0, -820, 1080, 768], src: [222, 32, 422, 300]},
 };
 const GAME: Record<Layout, {dst: Rect; src: Rect}> = {
 	split: {dst: [0, 768, 1080, 1152], src: [0, 482, 720, 768]},
-	cam_full: {dst: [0, 1960, 1080, 1152], src: [0, 482, 720, 768]},
+	cam_full: {dst: [0, 1266, 1080, 654], src: [0, 560, 720, 436]},
 	game_full: {dst: [0, 0, 1080, 1920], src: [110, 480, 382, 680]},
 };
-const SUB_Y: Record<Layout, number> = {split: 768, cam_full: 1395, game_full: 470};
+const SUB_Y: Record<Layout, number> = {split: 768, cam_full: 1266, game_full: 470};
 
 const segs = data.timemap.segments as {id: string; out_in: number; out_out: number; layout: Layout}[];
 const words = data.words as {text: string; s: number; e: number; emotion: string; flags: string[]}[];
@@ -220,12 +220,13 @@ export const Main: React.FC = () => {
 				/>
 			</div>
 			<View dst={game.dst} src={game.src} zoom={gameZoom} focus={[0.5, 0.62]} shake={gShake} blur={whipBlur} />
-			<View dst={cam.dst} src={cam.src} zoom={camZoom} focus={[0.58, 0.45]} shake={[0, 0]} blur={L.to === 'game_full' ? whipBlur : 0} />
+			<View dst={cam.dst} src={cam.src} zoom={camZoom} focus={[0.58, 0.3]} shake={[0, 0]} blur={L.to === 'game_full' ? whipBlur : 0} />
 			{/* soft shadow on the cam/game seam so the cut reads as one design */}
-			{L.to === 'cam_full' || L.from === 'cam_full' ? null : (
+			{L.to === 'game_full' && L.p > 0.95 ? null : (
 				<div style={{position: 'absolute', left: 0, width: 1080, top: cam.dst[1] + cam.dst[3] - 2, height: 26, background: 'linear-gradient(rgba(11,21,48,0.45), rgba(11,21,48,0))'}} />
 			)}
-			<MicMute t={t} start={ev.micro - 0.04} exit={seg('F').out_in} />
+			<MicMute t={t} start={chatWords[2].s - 0.04} slashAt={chatWords[3].s} exit={chatEnd} />
+			<MicMute t={t} start={ev.micro - 0.04} slashAt={ev.micro + 0.11} exit={seg('F').out_in} />
 			{cur ? (
 				<div style={{position: 'absolute', left: 0, top: subY, width: 1080}}>
 					<Word w={cur} t={t} fps={fps} />
