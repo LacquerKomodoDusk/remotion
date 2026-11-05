@@ -18,8 +18,8 @@ export const XpToast: React.FC<{t: number; start: number; top: number}> = ({t, s
 	const lf = (t - start) * fps;
 	if (lf < 0) return null;
 	const inP = spring({frame: lf, fps, config: {damping: 11, stiffness: 190, mass: 0.8}});
-	const x = interpolate(inP, [0, 1], [900, 0]);
-	const sc = interpolate(lf, [0, 6, 14], [0.7, 1.08, 1], {extrapolateRight: 'clamp', easing: Easing.out(Easing.cubic)});
+	const x = 0;
+	const sc = interpolate(lf, [0, 6, 14], [0.4, 1.1, 1], {extrapolateRight: 'clamp', easing: Easing.out(Easing.cubic)});
 	const numP = spring({frame: lf - 7, fps, config: {damping: 9, stiffness: 220}});
 	const glint = interpolate(lf, [10, 34], [-300, 1100], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.inOut(Easing.cubic)});
 	// XP counter ticks up like the game's
@@ -30,7 +30,7 @@ export const XpToast: React.FC<{t: number; start: number; top: number}> = ({t, s
 		{x: 860, y: 170, d: 17},
 	];
 	return (
-		<div style={{position: 'absolute', left: 110, top, width: 790, transform: `translateX(${x}px) scale(${sc})`, transformOrigin: '50% 50%'}}>
+		<div style={{position: 'absolute', left: 110, top, width: 790, transform: `translateX(${x}px) scale(${sc * interpolate(inP, [0, 1], [0.6, 1])})`, opacity: Math.min(1, lf / 3), transformOrigin: '50% 50%'}}>
 			<div
 				style={{
 					position: 'relative',

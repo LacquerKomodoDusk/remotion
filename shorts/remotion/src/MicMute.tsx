@@ -32,16 +32,16 @@ export const MicMute: React.FC<{t: number; start: number; slashAt: number; exit:
 	);
 	const lf = (t - start) * fps;
 	const ex = (t - exit) * fps;
-	if (lf < 0 || ex > 26) return null;
+	if (lf < 0 || ex > 12) return null;
 	const inP = spring({frame: lf, fps, config: {damping: 10, stiffness: 170}});
 	const slashP = spring({frame: (t - slashAt) * fps, fps, config: {damping: 8, stiffness: 260}});
-	const outP = ex > 0 ? interpolate(ex, [0, 22], [0, 1], {extrapolateRight: 'clamp'}) : 0;
+	const outP = ex > 0 ? interpolate(ex, [0, 10], [0, 1], {extrapolateRight: 'clamp'}) : 0;
 	const s = inP * (1 - outP) * 1.0;
 	const rotY = interpolate(inP, [0, 1], [-2.6, 0.32]) + Math.sin(lf / 9) * 0.08;
 	const wob = Math.sin(lf / 5) * 0.06 * (1 - Math.min(1, lf / 40));
 	// screen anchor (px): left of the face, over the monitor in the background — never on the face
 	const px = 245;
-	const py = 470 - outP * 500;
+	const py = 470;
 	const U = 1920 / (2 * 10 * Math.tan((30 / 2) * (Math.PI / 180)));
 	const x = (px - 540) / U;
 	const y = (960 - py) / U;

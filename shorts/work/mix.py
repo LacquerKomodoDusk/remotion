@@ -11,7 +11,6 @@ words=an['words']
 g=np.full(N,0.5)
 for w in words:
   a=int((w['s']-0.06)*SR); b=int((w['e']+0.10)*SR); g[max(0,a):b]=1.0
-g2=int(segs['G2a']['out_in']*SR); g[g2:]=np.maximum(g[g2:],0.9)
 k=int(.04*SR); g=np.convolve(g,np.ones(k)/k,mode='same')
 y=y*g[:,None]
 # 2) quack over mat: mute word, procedural duck call of same length
@@ -42,16 +41,15 @@ def sub_hit(t0,dur=0.5,f=52,amp=0.55):
   n=int(dur*SR); t=np.arange(n)/SR; s=np.sin(2*np.pi*(f+30*np.exp(-t*25))*t)*np.exp(-t*6)*amp
   a=int(t0*SR); y[a:a+n]+=s[:,None][:N-a]
 e1=[w for w in words if w['text']=='б**'][0]['s']; sub_hit(e1-0.01,0.45,55,0.35)
-lo=sosfilt(butter(2,140,'low',fs=SR,output='sos'),y[g2:],axis=0); y[g2:]+=lo*1.6
-shot=out_of_src(43.58,'G2a'); sub_hit(shot,0.7,48,0.6)
+toast_t=round(out_of_src(40.42,'F'),3); sub_hit(toast_t,0.6,50,0.45); shot=999.0
+tp=int(toast_t*SR); lo=sosfilt(butter(2,140,'low',fs=SR,output='sos'),y[tp:],axis=0); y[tp:]+=lo*1.2
 # 5) XP ding for the punchline toast (Fortnite-ish UI chime), whoosh into game_full
-toast_t=round(shot+0.18,3)
 n=int(0.9*SR); t=np.arange(n)/SR
 ding=(np.sin(2*np.pi*1568*t)+0.6*np.sin(2*np.pi*2349*t)+0.3*np.sin(2*np.pi*3136*t))*np.exp(-t*5)*np.minimum(1,t/0.004)
 a=int(toast_t*SR); y[a:a+n]+=0.16*ding[:,None][:N-a]
 n=int(0.28*SR); t=np.arange(n)/SR; wn=rng.standard_normal(n)
 wh=sosfilt(butter(2,[600,5000],'bandpass',fs=SR,output='sos'),wn)*np.sin(np.pi*t/0.28)**2*0.12
-a=int((segs['G2a']['out_in']-0.16)*SR); y[a:a+n]+=wh[:,None]
+a=int((segs['F']['out_in']-0.16)*SR); y[a:a+n]+=0.6*wh[:,None]
 # hard cut at end: 4ms fade only
 y[-int(.004*SR):]*=np.linspace(1,0,int(.004*SR))[:,None]
 sf.write('work/mix_premaster.wav',y.astype(np.float32),SR)

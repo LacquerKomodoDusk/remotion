@@ -39,7 +39,7 @@ const SRC_H = 1280;
 // dst rect on the 1080x1920 canvas + src rect in the 720x1280 source, per layout
 const CAM: Record<Layout, {dst: Rect; src: Rect}> = {
 	split: {dst: [0, 0, 1080, 768], src: [222, 32, 422, 300]},
-	cam_full: {dst: [0, 150, 1080, 1116], src: [330, 34, 290, 300]},
+	cam_full: {dst: [0, 150, 1080, 1116], src: [332, 34, 286, 296]},
 	game_full: {dst: [0, -820, 1080, 768], src: [222, 32, 422, 300]},
 };
 const GAME: Record<Layout, {dst: Rect; src: Rect}> = {
@@ -98,7 +98,9 @@ const View: React.FC<{dst: Rect; src: Rect; zoom: number; focus: [number, number
 	const h = sh / zoom;
 	const x = fx - (fx - sx) / zoom;
 	const y = fy - (fy - sy) / zoom;
-	const s = dst[2] / w;
+	const s = Math.max(dst[2] / w, dst[3] / h);
+	const ox = (dst[2] - w * s) / 2;
+	const oy = (dst[3] - h * s) / 2;
 	return (
 		<div style={{position: 'absolute', left: dst[0], top: dst[1], width: dst[2], height: dst[3], overflow: 'hidden'}}>
 			<OffthreadVideo
@@ -106,8 +108,8 @@ const View: React.FC<{dst: Rect; src: Rect; zoom: number; focus: [number, number
 				muted
 				style={{
 					position: 'absolute',
-					left: -x * s + shake[0],
-					top: -y * s + shake[1],
+					left: -x * s + ox + shake[0],
+					top: -y * s + oy + shake[1],
 					width: SRC_W * s,
 					height: SRC_H * s,
 					maxWidth: 'none',
@@ -179,8 +181,8 @@ export const Main: React.FC = () => {
 	const seg = (id: string) => segs.find((s) => s.id === id)!;
 	const hook = spring({frame, fps, config: {damping: 14, stiffness: 120}});
 	let camZoom = lerp(1.14, 1.0, hook);
-	const c3 = seg('C3');
-	camZoom *= interpolate(t, [c3.out_in, seg('FRZ').out_out], [1, 1.1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.inOut(Easing.cubic)});
+	const frz = seg('FRZ');
+	camZoom *= interpolate(t, [frz.out_in, frz.out_out], [1, 1.1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.inOut(Easing.cubic)});
 	const e1 = seg('E1');
 	if (t >= e1.out_in && t < seg('F').out_in) {
 		const pf = (t - e1.out_in) * fps;
@@ -188,12 +190,10 @@ export const Main: React.FC = () => {
 		camZoom = lerp(1.1, 1.2, punch) + interpolate(pf, [0, 4, 16], [0, 0.08, 0], {extrapolateRight: 'clamp'});
 	}
 	const f = seg('F');
-	if (t >= f.out_in && t < seg('G1').out_in) camZoom = interpolate(t, [f.out_in, f.out_out], [1.0, 1.08], {easing: Easing.inOut(Easing.cubic)});
-	if (t >= seg('G1').out_in) camZoom = 1;
+	if (t >= f.out_in) camZoom = interpolate(t, [f.out_in, f.out_out], [1.0, 1.08], {easing: Easing.inOut(Easing.cubic)});
 
 	// --- game camera: slow push to the target in slow-mo, shake on the shot
-	const g2 = seg('G2a');
-	const gameZoom = t >= g2.out_in ? interpolate(t, [g2.out_in, seg('G2b').out_out], [1.0, 1.14], {easing: Easing.inOut(Easing.cubic)}) : 1;
+	const gameZoom = 1;
 	const shotAmp = t >= ev.shot ? interpolate(t - ev.shot, [0, 0.5], [16, 3], {extrapolateRight: 'clamp'}) : 0;
 	const gShake: [number, number] = [noise(t * 1.7, 3) * shotAmp, noise(t * 1.7, 9) * shotAmp];
 
@@ -233,7 +233,7 @@ export const Main: React.FC = () => {
 				</div>
 			) : null}
 			<ChatCard t={t} words={chatWords} exit={subWords[0].s - 0.12} y={768} />
-			<XpToast t={t} start={ev.toast} top={930} />
+			<XpToast t={t} start={ev.toast} top={1150} />
 			{/* grade: vignette + grain (8 pre-rendered PNGs) */}
 			<AbsoluteFill style={{background: 'radial-gradient(ellipse at 50% 48%, rgba(0,0,0,0) 55%, rgba(5,8,25,0.38) 100%)'}} />
 			<Img src={staticFile(`grain/${Math.floor(frame / 2) % 8}.png`)} style={{position: 'absolute', inset: 0, width: 1080, height: 1920, mixBlendMode: 'overlay'}} />
