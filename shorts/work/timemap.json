@@ -1,0 +1,93 @@
+{
+ "total": 15.095062500000001,
+ "segments": [
+  {
+   "id": "A",
+   "out_in": 0.0,
+   "out_out": 2.005916666666667,
+   "layout": "split",
+   "src_in": 15.0,
+   "src_out": 17.05
+  },
+  {
+   "id": "B",
+   "out_in": 2.005916666666667,
+   "out_out": 2.775104166666667,
+   "layout": "split",
+   "src_in": 18.22,
+   "src_out": 19.0
+  },
+  {
+   "id": "C1",
+   "out_in": 2.775104166666667,
+   "out_out": 3.375104166666667,
+   "layout": "split",
+   "src_in": 21.98,
+   "src_out": 22.58
+  },
+  {
+   "id": "C2",
+   "out_in": 3.375104166666667,
+   "out_out": 3.815104166666667,
+   "layout": "split",
+   "src_in": 23.06,
+   "src_out": 23.5
+  },
+  {
+   "id": "C3",
+   "out_in": 3.815104166666667,
+   "out_out": 5.849375,
+   "layout": "split",
+   "src_in": 24.52,
+   "src_out": 26.52
+  },
+  {
+   "id": "FRZ",
+   "out_in": 5.849375,
+   "out_out": 6.1693750000000005,
+   "layout": "split",
+   "src_in": 26.5,
+   "src_out": 26.5
+  },
+  {
+   "id": "E1",
+   "out_in": 6.1693750000000005,
+   "out_out": 8.009395833333334,
+   "layout": "split",
+   "src_in": 33.13,
+   "src_out": 34.97
+  },
+  {
+   "id": "E2",
+   "out_in": 8.009395833333334,
+   "out_out": 8.489416666666667,
+   "layout": "split",
+   "src_in": 35.66,
+   "src_out": 36.14
+  },
+  {
+   "id": "F",
+   "out_in": 8.489416666666667,
+   "out_out": 11.1298125,
+   "layout": "cam_full",
+   "src_in": 37.78,
+   "src_out": 40.55
+  },
+  {
+   "id": "G1",
+   "out_in": 11.1298125,
+   "out_out": 12.513645833333333,
+   "layout": "split",
+   "src_in": 41.78,
+   "src_out": 43.18
+  },
+  {
+   "id": "G2",
+   "out_in": 12.513645833333333,
+   "out_out": 15.095062500000001,
+   "layout": "game_full",
+   "src_in": 43.18,
+   "src_out": 44.49
+  }
+ ]
+}

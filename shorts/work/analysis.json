@@ -1,0 +1,422 @@
+{
+ "source": {
+  "w": 720,
+  "h": 1280,
+  "fps": 30,
+  "dur": 44.5,
+  "cam_box": [
+   195,
+   15,
+   665,
+   395
+  ],
+  "logo_box": [
+   315,
+   330,
+   545,
+   425
+  ],
+  "game_top": 428,
+  "hud_ammo": [
+   480,
+   1170,
+   720,
+   1230
+  ]
+ },
+ "game": "Fortnite (Глава 6), уверенность ~95%",
+ "words": [
+  {
+   "text": "у",
+   "src_s": 15.19,
+   "src_e": 15.27,
+   "s": 0.19,
+   "e": 0.27,
+   "emotion": "neutral",
+   "flags": []
+  },
+  {
+   "text": "тебя",
+   "src_s": 15.35,
+   "src_e": 15.55,
+   "s": 0.35,
+   "e": 0.55,
+   "emotion": "neutral",
+   "flags": []
+  },
+  {
+   "text": "микро",
+   "src_s": 15.59,
+   "src_e": 15.91,
+   "s": 0.59,
+   "e": 0.91,
+   "emotion": "neutral",
+   "flags": []
+  },
+  {
+   "text": "выключено",
+   "src_s": 15.91,
+   "src_e": 16.47,
+   "s": 0.91,
+   "e": 1.47,
+   "emotion": "panic",
+   "flags": []
+  },
+  {
+   "text": "АХАХ",
+   "src_s": 16.51,
+   "src_e": 16.87,
+   "s": 1.51,
+   "e": 1.855,
+   "emotion": "joy",
+   "flags": [
+    "stretch"
+   ]
+  },
+  {
+   "text": "нормально",
+   "src_s": 18.39,
+   "src_e": 18.87,
+   "s": 2.165,
+   "e": 2.645,
+   "emotion": "confident",
+   "flags": []
+  },
+  {
+   "text": "я",
+   "src_s": 22.08,
+   "src_e": 22.16,
+   "s": 2.875,
+   "e": 2.955,
+   "emotion": "confident",
+   "flags": []
+  },
+  {
+   "text": "говорю",
+   "src_s": 22.2,
+   "src_e": 22.52,
+   "s": 2.995,
+   "e": 3.315,
+   "emotion": "confident",
+   "flags": []
+  },
+  {
+   "text": "нет",
+   "src_s": 23.16,
+   "src_e": 23.44,
+   "s": 3.475,
+   "e": 3.755,
+   "emotion": "confident",
+   "flags": []
+  },
+  {
+   "text": "просто",
+   "src_s": 24.6,
+   "src_e": 25.0,
+   "s": 3.895,
+   "e": 4.295,
+   "emotion": "irony",
+   "flags": []
+  },
+  {
+   "text": "у",
+   "src_s": 25.04,
+   "src_e": 25.12,
+   "s": 4.335,
+   "e": 4.415,
+   "emotion": "irony",
+   "flags": []
+  },
+  {
+   "text": "меня",
+   "src_s": 25.16,
+   "src_e": 25.36,
+   "s": 4.455,
+   "e": 4.655,
+   "emotion": "irony",
+   "flags": []
+  },
+  {
+   "text": "это",
+   "src_s": 25.48,
+   "src_e": 25.68,
+   "s": 4.775,
+   "e": 4.975,
+   "emotion": "irony",
+   "flags": []
+  },
+  {
+   "text": "так",
+   "src_s": 25.76,
+   "src_e": 25.96,
+   "s": 5.055,
+   "e": 5.255,
+   "emotion": "irony",
+   "flags": []
+  },
+  {
+   "text": "и",
+   "src_s": 26.04,
+   "src_e": 26.12,
+   "s": 5.335,
+   "e": 5.415,
+   "emotion": "irony",
+   "flags": []
+  },
+  {
+   "text": "было",
+   "src_s": 26.2,
+   "src_e": 26.44,
+   "s": 5.495,
+   "e": 5.755,
+   "emotion": "irony",
+   "flags": []
+  },
+  {
+   "text": "б**",
+   "src_s": 33.27,
+   "src_e": 33.44,
+   "s": 6.309,
+   "e": 6.479,
+   "emotion": "panic",
+   "flags": [
+    "mat"
+   ],
+   "quack": [
+    6.309,
+    6.479
+   ]
+  },
+  {
+   "text": "а",
+   "src_s": 33.63,
+   "src_e": 33.71,
+   "s": 6.669,
+   "e": 6.749,
+   "emotion": "panic",
+   "flags": []
+  },
+  {
+   "text": "чё",
+   "src_s": 33.75,
+   "src_e": 33.95,
+   "s": 6.789,
+   "e": 6.989,
+   "emotion": "panic",
+   "flags": []
+  },
+  {
+   "text": "я",
+   "src_s": 33.95,
+   "src_e": 34.03,
+   "s": 6.989,
+   "e": 7.069,
+   "emotion": "panic",
+   "flags": []
+  },
+  {
+   "text": "долго",
+   "src_s": 34.07,
+   "src_e": 34.35,
+   "s": 7.109,
+   "e": 7.389,
+   "emotion": "panic",
+   "flags": []
+  },
+  {
+   "text": "так",
+   "src_s": 34.35,
+   "src_e": 34.55,
+   "s": 7.389,
+   "e": 7.589,
+   "emotion": "panic",
+   "flags": []
+  },
+  {
+   "text": "сидел",
+   "src_s": 34.55,
+   "src_e": 34.87,
+   "s": 7.589,
+   "e": 7.909,
+   "emotion": "panic",
+   "flags": []
+  },
+  {
+   "text": "с",
+   "src_s": 34.87,
+   "src_e": 34.95,
+   "s": 7.909,
+   "e": 7.989,
+   "emotion": "panic",
+   "flags": []
+  },
+  {
+   "text": "микро",
+   "src_s": 35.72,
+   "src_e": 36.06,
+   "s": 8.069,
+   "e": 8.409,
+   "emotion": "panic",
+   "flags": [
+    "shout"
+   ]
+  },
+  {
+   "text": "ОРУНЯКА",
+   "src_s": 37.93,
+   "src_e": 38.45,
+   "s": 8.639,
+   "e": 9.159,
+   "emotion": "joy",
+   "flags": [
+    "stretch"
+   ]
+  },
+  {
+   "text": "ХА-ХА-ХА",
+   "src_s": 39.3,
+   "src_e": 40.4,
+   "s": 10.009,
+   "e": 11.01,
+   "emotion": "joy",
+   "flags": [
+    "stretch"
+   ]
+  },
+  {
+   "text": "сижу",
+   "src_s": 41.9,
+   "src_e": 42.26,
+   "s": 11.239,
+   "e": 11.594,
+   "emotion": "irony",
+   "flags": []
+  },
+  {
+   "text": "п****",
+   "src_s": 42.45,
+   "src_e": 42.82,
+   "s": 11.784,
+   "e": 12.154,
+   "emotion": "irony",
+   "flags": [
+    "mat"
+   ],
+   "quack": [
+    11.784,
+    12.154
+   ]
+  },
+  {
+   "text": "ОПААА",
+   "src_s": 43.24,
+   "src_e": 43.47,
+   "s": 12.595,
+   "e": 13.055,
+   "emotion": "panic",
+   "flags": [
+    "shout",
+    "stretch"
+   ]
+  }
+ ],
+ "timemap": {
+  "total": 15.095062500000001,
+  "segments": [
+   {
+    "id": "A",
+    "out_in": 0.0,
+    "out_out": 2.005916666666667,
+    "layout": "split",
+    "src_in": 15.0,
+    "src_out": 17.05
+   },
+   {
+    "id": "B",
+    "out_in": 2.005916666666667,
+    "out_out": 2.775104166666667,
+    "layout": "split",
+    "src_in": 18.22,
+    "src_out": 19.0
+   },
+   {
+    "id": "C1",
+    "out_in": 2.775104166666667,
+    "out_out": 3.375104166666667,
+    "layout": "split",
+    "src_in": 21.98,
+    "src_out": 22.58
+   },
+   {
+    "id": "C2",
+    "out_in": 3.375104166666667,
+    "out_out": 3.815104166666667,
+    "layout": "split",
+    "src_in": 23.06,
+    "src_out": 23.5
+   },
+   {
+    "id": "C3",
+    "out_in": 3.815104166666667,
+    "out_out": 5.849375,
+    "layout": "split",
+    "src_in": 24.52,
+    "src_out": 26.52
+   },
+   {
+    "id": "FRZ",
+    "out_in": 5.849375,
+    "out_out": 6.1693750000000005,
+    "layout": "split",
+    "src_in": 26.5,
+    "src_out": 26.5
+   },
+   {
+    "id": "E1",
+    "out_in": 6.1693750000000005,
+    "out_out": 8.009395833333334,
+    "layout": "split",
+    "src_in": 33.13,
+    "src_out": 34.97
+   },
+   {
+    "id": "E2",
+    "out_in": 8.009395833333334,
+    "out_out": 8.489416666666667,
+    "layout": "split",
+    "src_in": 35.66,
+    "src_out": 36.14
+   },
+   {
+    "id": "F",
+    "out_in": 8.489416666666667,
+    "out_out": 11.1298125,
+    "layout": "cam_full",
+    "src_in": 37.78,
+    "src_out": 40.55
+   },
+   {
+    "id": "G1",
+    "out_in": 11.1298125,
+    "out_out": 12.513645833333333,
+    "layout": "split",
+    "src_in": 41.78,
+    "src_out": 43.18
+   },
+   {
+    "id": "G2",
+    "out_in": 12.513645833333333,
+    "out_out": 15.095062500000001,
+    "layout": "game_full",
+    "src_in": 43.18,
+    "src_out": 44.49
+   }
+  ]
+ },
+ "events": {
+  "shot": 13.275,
+  "toast": 13.455,
+  "realize": 6.309,
+  "micro": 8.069
+ }
+}

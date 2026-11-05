@@ -1,0 +1,14 @@
+input/
+remotion/node_modules/
+remotion/public/master.mp4
+work/*.mp4
+work/*.wav
+work/*.npy
+work/*.log
+work/frames/
+work/cam/
+work/stills/
+work/qc/
+work/interp/
+work/*.png
+work/*.jpg
