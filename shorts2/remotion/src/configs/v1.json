@@ -1,0 +1,197 @@
+{
+ "dur": 15.466,
+ "concept": "realestate",
+ "words": [
+  {
+   "text": "опять",
+   "s": 0.77,
+   "e": 1.01,
+   "emotion": "neutral",
+   "flags": []
+  },
+  {
+   "text": "какая-то",
+   "s": 1.01,
+   "e": 1.41,
+   "emotion": "neutral",
+   "flags": []
+  },
+  {
+   "text": "мегастройка",
+   "s": 1.41,
+   "e": 2.09,
+   "emotion": "panic",
+   "flags": []
+  },
+  {
+   "text": "была",
+   "s": 2.05,
+   "e": 2.29,
+   "emotion": "neutral",
+   "flags": []
+  },
+  {
+   "text": "я",
+   "s": 2.33,
+   "e": 2.41,
+   "emotion": "neutral",
+   "flags": []
+  },
+  {
+   "text": "прям",
+   "s": 2.41,
+   "e": 2.57,
+   "emotion": "neutral",
+   "flags": []
+  },
+  {
+   "text": "видел",
+   "s": 2.61,
+   "e": 2.89,
+   "emotion": "neutral",
+   "flags": []
+  },
+  {
+   "text": "эти",
+   "s": 2.93,
+   "e": 3.13,
+   "emotion": "neutral",
+   "flags": []
+  },
+  {
+   "text": "небоскрёбы",
+   "s": 3.13,
+   "e": 3.85,
+   "emotion": "panic",
+   "flags": []
+  },
+  {
+   "text": "а",
+   "s": 4.05,
+   "e": 4.13,
+   "emotion": "panic",
+   "flags": []
+  },
+  {
+   "text": "вот",
+   "s": 4.21,
+   "e": 4.41,
+   "emotion": "panic",
+   "flags": []
+  },
+  {
+   "text": "она",
+   "s": 4.45,
+   "e": 4.65,
+   "emotion": "panic",
+   "flags": []
+  },
+  {
+   "text": "идёт",
+   "s": 4.73,
+   "e": 5.05,
+   "emotion": "panic",
+   "flags": [
+    "shout"
+   ]
+  },
+  {
+   "text": "е****",
+   "s": 6.73,
+   "e": 7.69,
+   "emotion": "panic",
+   "flags": [
+    "mat",
+    "shout"
+   ]
+  },
+  {
+   "text": "Е****",
+   "s": 8.05,
+   "e": 9.25,
+   "emotion": "anger",
+   "flags": [
+    "mat",
+    "shout"
+   ]
+  }
+ ],
+ "layouts": [
+  [
+   0,
+   "split"
+  ],
+  [
+   4.2,
+   "game_full"
+  ],
+  [
+   6.6,
+   "split"
+  ],
+  [
+   9.6,
+   "cam_full"
+  ],
+  [
+   11.4,
+   "split"
+  ]
+ ],
+ "gameFull": [
+  164,
+  604,
+  580,
+  1028
+ ],
+ "gameKeys": [
+  [
+   4.2,
+   1.0,
+   0.5,
+   0.45
+  ],
+  [
+   6.5,
+   1.35,
+   0.5,
+   0.42
+  ],
+  [
+   9.5,
+   1.35,
+   0.5,
+   0.42
+  ],
+  [
+   11.3,
+   1.0,
+   0.5,
+   0.5
+  ]
+ ],
+ "punches": [
+  [
+   1.41,
+   "cam",
+   0.1
+  ],
+  [
+   6.73,
+   "cam",
+   0.14
+  ],
+  [
+   8.05,
+   "cam",
+   0.2
+  ]
+ ],
+ "punch": {
+  "t": 12.3
+ },
+ "ruler": {
+  "t0": 4.6,
+  "t1": 9.3
+ }
+}
