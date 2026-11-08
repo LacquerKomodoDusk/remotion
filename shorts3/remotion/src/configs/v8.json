@@ -1,0 +1,396 @@
+{
+ "frames": 1800,
+ "concept": "tip",
+ "words": [
+  {
+   "text": "а",
+   "s": 2.72,
+   "e": 2.88,
+   "emotion": "panic",
+   "flags": []
+  },
+  {
+   "text": "б****",
+   "s": 2.88,
+   "e": 3.2,
+   "emotion": "panic",
+   "flags": [
+    "mat"
+   ]
+  },
+  {
+   "text": "я",
+   "s": 4.96,
+   "e": 5.3,
+   "emotion": "confident",
+   "flags": [
+    "shout"
+   ]
+  },
+  {
+   "text": "кто?",
+   "s": 8.4,
+   "e": 8.58,
+   "emotion": "panic",
+   "flags": []
+  },
+  {
+   "text": "кто?",
+   "s": 8.56,
+   "e": 8.74,
+   "emotion": "panic",
+   "flags": []
+  },
+  {
+   "text": "кто?",
+   "s": 8.76,
+   "e": 8.94,
+   "emotion": "panic",
+   "flags": []
+  },
+  {
+   "text": "кто?",
+   "s": 8.96,
+   "e": 9.14,
+   "emotion": "panic",
+   "flags": []
+  },
+  {
+   "text": "кто?",
+   "s": 9.12,
+   "e": 9.299999999999999,
+   "emotion": "panic",
+   "flags": []
+  },
+  {
+   "text": "кто?",
+   "s": 9.32,
+   "e": 9.5,
+   "emotion": "panic",
+   "flags": []
+  },
+  {
+   "text": "кто?",
+   "s": 9.52,
+   "e": 9.7,
+   "emotion": "panic",
+   "flags": []
+  },
+  {
+   "text": "где?",
+   "s": 10.72,
+   "e": 10.92,
+   "emotion": "panic",
+   "flags": []
+  },
+  {
+   "text": "где?",
+   "s": 10.92,
+   "e": 11.12,
+   "emotion": "panic",
+   "flags": []
+  },
+  {
+   "text": "где?",
+   "s": 11.12,
+   "e": 11.319999999999999,
+   "emotion": "panic",
+   "flags": []
+  },
+  {
+   "text": "где?",
+   "s": 11.32,
+   "e": 11.52,
+   "emotion": "panic",
+   "flags": [
+    "shout"
+   ]
+  },
+  {
+   "text": "так",
+   "s": 19.38,
+   "e": 19.62,
+   "emotion": "confident",
+   "flags": []
+  },
+  {
+   "text": "сюда",
+   "s": 19.62,
+   "e": 20.02,
+   "emotion": "confident",
+   "flags": []
+  },
+  {
+   "text": "вот",
+   "s": 20.02,
+   "e": 20.38,
+   "emotion": "confident",
+   "flags": []
+  },
+  {
+   "text": "б****",
+   "s": 20.38,
+   "e": 20.62,
+   "emotion": "confident",
+   "flags": [
+    "mat"
+   ]
+  },
+  {
+   "text": "сейчас",
+   "s": 20.62,
+   "e": 20.9,
+   "emotion": "irony",
+   "flags": []
+  },
+  {
+   "text": "бы",
+   "s": 20.9,
+   "e": 21.02,
+   "emotion": "irony",
+   "flags": []
+  },
+  {
+   "text": "если",
+   "s": 21.02,
+   "e": 21.3,
+   "emotion": "irony",
+   "flags": []
+  },
+  {
+   "text": "правую",
+   "s": 21.34,
+   "e": 21.8,
+   "emotion": "irony",
+   "flags": []
+  },
+  {
+   "text": "клавишу",
+   "s": 22.42,
+   "e": 22.8,
+   "emotion": "irony",
+   "flags": []
+  },
+  {
+   "text": "зажал",
+   "s": 22.82,
+   "e": 23.26,
+   "emotion": "irony",
+   "flags": []
+  },
+  {
+   "text": "бы",
+   "s": 23.26,
+   "e": 23.38,
+   "emotion": "irony",
+   "flags": []
+  },
+  {
+   "text": "опять",
+   "s": 23.38,
+   "e": 23.66,
+   "emotion": "irony",
+   "flags": []
+  },
+  {
+   "text": "бы",
+   "s": 23.66,
+   "e": 23.78,
+   "emotion": "irony",
+   "flags": []
+  },
+  {
+   "text": "отъехал",
+   "s": 23.78,
+   "e": 24.3,
+   "emotion": "irony",
+   "flags": [
+    "shout"
+   ]
+  },
+  {
+   "text": "это",
+   "s": 28.66,
+   "e": 28.9,
+   "emotion": "anger",
+   "flags": []
+  },
+  {
+   "text": "что",
+   "s": 28.9,
+   "e": 29.1,
+   "emotion": "anger",
+   "flags": []
+  },
+  {
+   "text": "с",
+   "s": 29.14,
+   "e": 29.26,
+   "emotion": "anger",
+   "flags": []
+  },
+  {
+   "text": "тобой",
+   "s": 29.26,
+   "e": 29.5,
+   "emotion": "anger",
+   "flags": []
+  },
+  {
+   "text": "не",
+   "s": 29.5,
+   "e": 29.66,
+   "emotion": "anger",
+   "flags": []
+  },
+  {
+   "text": "так?",
+   "s": 29.66,
+   "e": 30.0,
+   "emotion": "anger",
+   "flags": [
+    "shout"
+   ]
+  }
+ ],
+ "layouts": [
+  [
+   0,
+   "game_full"
+  ],
+  [
+   3.4,
+   "split"
+  ],
+  [
+   8.2,
+   "cam_full"
+  ],
+  [
+   11.9,
+   "split"
+  ],
+  [
+   15.6,
+   "game_full"
+  ],
+  [
+   20.8,
+   "split"
+  ]
+ ],
+ "gameFull": [
+  164,
+  604,
+  580,
+  1028
+ ],
+ "gameKeys": [
+  [
+   0,
+   1.15,
+   0.5,
+   0.45
+  ],
+  [
+   3.3,
+   1.0,
+   0.5,
+   0.45
+  ],
+  [
+   15.6,
+   1.0,
+   0.5,
+   0.45
+  ],
+  [
+   19.0,
+   1.15,
+   0.5,
+   0.42
+  ],
+  [
+   20.7,
+   1.15,
+   0.5,
+   0.42
+  ],
+  [
+   20.8,
+   1.0,
+   0.5,
+   0.5
+  ]
+ ],
+ "punches": [
+  [
+   1.0,
+   "game",
+   0.08
+  ],
+  [
+   2.4,
+   "game",
+   0.1
+  ],
+  [
+   8.4,
+   "cam",
+   0.08
+  ],
+  [
+   10.72,
+   "cam",
+   0.1
+  ],
+  [
+   11.32,
+   "cam",
+   0.14
+  ],
+  [
+   19.2,
+   "game",
+   0.1
+  ],
+  [
+   29.66,
+   "cam",
+   0.1
+  ]
+ ],
+ "loud": [
+  [
+   0,
+   3.4
+  ],
+  [
+   15.6,
+   20.8
+  ]
+ ],
+ "mouse": {
+  "t0": 21.3,
+  "t1": 24.2
+ },
+ "sfx": [
+  [
+   "whoosh",
+   15.5
+  ],
+  [
+   "sub",
+   19.2,
+   0.25
+  ],
+  [
+   "bell",
+   26.0
+  ]
+ ],
+ "punch": {
+  "t": 26.0
+ },
+ "dur": 30.0
+}

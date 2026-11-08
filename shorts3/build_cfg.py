@@ -1,3 +1,4 @@
+import sys
 import json
 # word: text, start, end, emotion, flags. Mat words are written already masked (first letter + stars).
 W=lambda t,s,e,em='neutral',fl='': {"text":t,"s":s,"e":e,"emotion":em,"flags":[f for f in fl.split(',') if f]}
@@ -71,7 +72,34 @@ C[6]={"frames":1799,"concept":"captcha",
  "punches":[[0.5,'game',0.08],[6.87,'cam',0.12],[19.2,'game',0.12],[20.8,'game',0.12],[27.63,'cam',0.12]],
  "loud":[[0,5.0],[17.0,22.2]],"sfx":[["whoosh",16.9],["sub",19.2,0.28],["sub",20.8,0.28],["whoosh",22.1],["buzz",27.8]],
  "punch":{"t":27.8}}
-for k,v in C.items():
+# v7 — Zoro katana scramble, ~10 mat words; picks up a slingshot: «что это за говно»
+M=lambda t,s,e,em='anger',fl='': W(t,s,e,em,'mat'+(','+fl if fl else ''))
+C[7]={"frames":2012,"concept":"jar",
+ "words":[W("оп",3.2,3.4,'confident'),W("а",4.8,4.88,'irony'),W("что",4.88,5.08,'irony'),M("б****",5.08,5.36,'irony'),W("не",5.36,5.52,'irony'),W("ожидал",5.52,5.92,'irony'),W("да?",5.92,6.3,'irony'),
+          M("б****",10.31,10.55,'panic'),W("да",10.55,10.71,'panic'),W("что",10.71,10.87,'panic'),W("это",10.87,11.07,'panic'),W("такое",11.07,11.5,'panic','shout'),W("ХА-ХА",11.51,12.1,'joy','stretch'),
+          M("б****",15.67,15.95),W("ты",16.23,16.39,'anger'),W("что",16.39,16.59,'anger'),W("урод",16.67,17.0,'anger','shout'),
+          M("б****",18.19,18.47),M("е*****",18.47,18.8),W("да",19.23,19.59,'anger'),M("в******",19.59,19.99),W("ты",19.99,20.15,'anger'),W("ему",20.15,20.39,'anger'),M("н*****",20.39,20.75,'anger','shout'),
+          W("что",24.25,24.37,'irony'),W("это",24.37,24.57,'irony'),W("за",24.57,24.69,'irony'),W("говно",24.69,25.05,'irony','shout'),M("б****",25.05,25.33,'irony'),
+          M("б****",32.17,32.6,'neutral'),M("п*****",32.65,33.2,'neutral')],
+ "layouts":[[0,'split'],[2.9,'game_full'],[6.5,'split'],[10.1,'cam_full'],[12.4,'game_full'],[16.0,'cam_full'],[18.9,'split'],[23.6,'game_full'],[25.6,'split']],
+ "gameFull":GF,"gameKeys":[[2.9,1.0,0.5,0.45],[6.4,1.15,0.5,0.45],[12.4,1.0,0.5,0.45],[15.9,1.15,0.5,0.45],[23.6,1.0,0.5,0.5],[25.5,1.15,0.5,0.5],[25.6,1.0,0.5,0.5]],
+ "punches":[[3.2,'game',0.10],[5.08,'game',0.10],[10.31,'cam',0.12],[16.67,'cam',0.14],[20.39,'cam',0.10],[24.69,'game',0.12]],"shake":[[18.19,18.9,8]],
+ "loud":[[2.9,9.5],[12.4,16.0]],"sfx":[["whoosh",2.8],["whoosh",12.3],["whoosh",23.5],["bell",25.8]],
+ "punch":{"t":25.8}}
+# v8 — two quick kills, «кто-кто-кто… где-где-где», «если бы правую клавишу зажал», a chest that won't give in
+C[8]={"frames":1800,"concept":"tip",
+ "words":[W("а",2.72,2.88,'panic'),W("б****",2.88,3.2,'panic','mat'),W("я",4.96,5.3,'confident','shout'),
+          *[W("кто?",s,s+0.18,'panic') for s in (8.4,8.56,8.76,8.96,9.12,9.32,9.52)],
+          *[W("где?",s,s+0.2,'panic','shout' if i==3 else '') for i,s in enumerate((10.72,10.92,11.12,11.32))],
+          W("так",19.38,19.62,'confident'),W("сюда",19.62,20.02,'confident'),W("вот",20.02,20.38,'confident'),W("б****",20.38,20.62,'confident','mat'),
+          W("сейчас",20.62,20.9,'irony'),W("бы",20.9,21.02,'irony'),W("если",21.02,21.3,'irony'),W("правую",21.34,21.8,'irony'),W("клавишу",22.42,22.8,'irony'),W("зажал",22.82,23.26,'irony'),W("бы",23.26,23.38,'irony'),W("опять",23.38,23.66,'irony'),W("бы",23.66,23.78,'irony'),W("отъехал",23.78,24.3,'irony','shout'),
+          W("это",28.66,28.9,'anger'),W("что",28.9,29.1,'anger'),W("с",29.14,29.26,'anger'),W("тобой",29.26,29.5,'anger'),W("не",29.5,29.66,'anger'),W("так?",29.66,30.0,'anger','shout')],
+ "layouts":[[0,'game_full'],[3.4,'split'],[8.2,'cam_full'],[11.9,'split'],[15.6,'game_full'],[20.8,'split']],
+ "gameFull":GF,"gameKeys":[[0,1.15,0.5,0.45],[3.3,1.0,0.5,0.45],[15.6,1.0,0.5,0.45],[19.0,1.15,0.5,0.42],[20.7,1.15,0.5,0.42],[20.8,1.0,0.5,0.5]],
+ "punches":[[1.0,'game',0.08],[2.4,'game',0.10],[8.4,'cam',0.08],[10.72,'cam',0.10],[11.32,'cam',0.14],[19.2,'game',0.10],[29.66,'cam',0.10]],
+ "loud":[[0,3.4],[15.6,20.8]],"mouse":{"t0":21.3,"t1":24.2},"sfx":[["whoosh",15.5],["sub",19.2,0.25],["bell",26.0]],
+ "punch":{"t":26.0}}
+for k,v in [(k,C[k]) for k in (sys.argv[1:] and map(int,sys.argv[1:]) or C)]:
   v["dur"]=v["frames"]/60
   json.dump(v,open(f'/home/user/remotion/shorts3/remotion/src/configs/v{k}.json','w'),ensure_ascii=False,indent=1)
 print('ok')

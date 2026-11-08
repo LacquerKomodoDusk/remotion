@@ -205,8 +205,84 @@ const Captcha: React.FC<P> = ({cfg, t, fps}) => {
 	);
 };
 
+// ---------------- v7: swear jar (coin per mat) + one card ----------------
+const Jar: React.FC<P> = ({cfg, t, fps}) => {
+	const mats = cfg.words.filter((w) => w.flags.includes('mat')).map((w) => w.s);
+	const n = mats.filter((s) => t >= s).length;
+	const last = n ? mats[n - 1] : -9;
+	const bump = interpolate((t - last) * fps, [0, 4, 14], [1.18, 0.96, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+	const els: React.ReactNode[] = [];
+	const jo = interpolate(t, [mats[0] - 0.4, mats[0] - 0.1], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+	els.push(
+		<div key="jar" style={{position: 'absolute', left: 40, top: 210, width: 170, opacity: jo, transform: `scale(${bump})`, transformOrigin: '50% 100%'}}>
+			{/* falling coin for the latest mat */}
+			{t - last < 0.35 ? <div style={{position: 'absolute', left: 64, top: interpolate(t - last, [0, 0.3], [-90, 60], {extrapolateRight: 'clamp', easing: Easing.in(Easing.quad)}), width: 42, height: 42, borderRadius: 21, background: GOLD, border: `5px solid ${NAVY}`, zIndex: 2}} /> : null}
+			<div style={{margin: '0 auto', width: 96, height: 22, background: '#C9CED8', border: `5px solid ${NAVY}`, borderRadius: 8}} />
+			<div style={{position: 'relative', height: 170, marginTop: -4, border: `6px solid ${NAVY}`, borderRadius: '26px 26px 34px 34px', background: 'rgba(200,230,255,0.35)', overflow: 'hidden', boxShadow: `0 10px 0 ${NAVY}`}}>
+				{Array.from({length: n}).map((_, i) => <div key={i} style={{position: 'absolute', left: 18 + ((i * 37) % 100), bottom: 6 + Math.floor(i / 3) * 16, width: 40, height: 16, borderRadius: 8, background: GOLD, border: `4px solid ${NAVY}`}} />)}
+				<div style={{position: 'absolute', left: 0, right: 0, top: 22, textAlign: 'center'}}>
+					<span style={txt(40, '#FFFFFF', {WebkitTextStroke: `10px ${NAVY}`, paintOrder: 'stroke fill'})}>{n * 50} ₽</span>
+				</div>
+			</div>
+		</div>,
+	);
+	const lf = (t - cfg.punch.t) * fps;
+	if (lf >= 0) {
+		els.push(
+			<Slot key="card" lf={lf} fps={fps}>
+				<div style={{...plate, background: '#FFF6E6', padding: '24px 30px 28px'}}>
+					<div style={txt(30, '#8A6A2A', {letterSpacing: '0.12em'})}>КОПИЛКА ЗА МАТ</div>
+					<div style={{display: 'flex', alignItems: 'baseline', gap: 18, marginTop: 14}}>
+						<span style={txt(62, NAVY)}>«говно»</span>
+						<span style={txt(40, NAVY)}>—</span>
+					</div>
+					<div style={{marginTop: 12, background: '#21C55D', borderRadius: 14, padding: '10px 18px', display: 'inline-block', border: `5px solid ${NAVY}`}}>
+						<span style={txt(44, NAVY)}>бесплатно</span>
+					</div>
+				</div>
+			</Slot>,
+		);
+	}
+	return <>{els}</>;
+};
+
+// ---------------- v8: right mouse button + loading-screen tip ----------------
+const Tip: React.FC<P> = ({cfg, t, fps}) => {
+	const m = cfg.mouse as {t0: number; t1: number};
+	const els: React.ReactNode[] = [];
+	if (t >= m.t0 && t < m.t1) {
+		const lf = (t - m.t0) * fps;
+		const o = interpolate(t, [m.t1 - 0.2, m.t1], [1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+		const press = Math.sin(t * Math.PI * 4) > 0;
+		els.push(
+			<div key="mouse" style={{position: 'absolute', left: 70, top: 900, opacity: o * Math.min(1, lf / 3), transform: `scale(${popIn(lf, fps).s})`}}>
+				<div style={{width: 150, height: 220, borderRadius: '75px 75px 70px 70px', background: '#F4F1E8', border: `7px solid ${NAVY}`, position: 'relative', overflow: 'hidden', boxShadow: `0 12px 0 ${NAVY}`}}>
+					<div style={{position: 'absolute', left: 68, top: 0, width: 7, height: 92, background: NAVY}} />
+					<div style={{position: 'absolute', left: 0, right: 0, top: 88, height: 7, background: NAVY}} />
+					<div style={{position: 'absolute', left: 75, top: 0, width: 75, height: 88, background: press ? GOLD : '#FFE7A0'}} />
+				</div>
+			</div>,
+		);
+	}
+	const lf = (t - cfg.punch.t) * fps;
+	if (lf >= 0) {
+		els.push(
+			<Slot key="tip" lf={lf} fps={fps}>
+				<div style={{...plate, background: 'linear-gradient(135deg, #1F4FD8, #5B2BC8)', padding: '24px 30px 28px'}}>
+					<div style={{background: GOLD, borderRadius: 10, padding: '6px 14px', display: 'inline-block', border: `4px solid ${NAVY}`}}>
+						<span style={txt(30, NAVY, {letterSpacing: '0.12em'})}>СОВЕТ</span>
+					</div>
+					<div style={txt(42, '#FFFFFF', {marginTop: 16})}>сундук не открывается?</div>
+					<div style={txt(42, GOLD, {marginTop: 10})}>зажмите правую клавишу</div>
+				</div>
+			</Slot>,
+		);
+	}
+	return <>{els}</>;
+};
+
 export const Concept: React.FC<P> = (p) => {
-	const m: Record<string, React.FC<P>> = {airport: Airport, tir: Tir, tabloid: Tabloid, cctv: Cctv, museum: Museum, captcha: Captcha};
+	const m: Record<string, React.FC<P>> = {airport: Airport, tir: Tir, tabloid: Tabloid, cctv: Cctv, museum: Museum, captcha: Captcha, jar: Jar, tip: Tip};
 	const C = m[p.cfg.concept];
 	return C ? <C {...p} /> : null;
 };
