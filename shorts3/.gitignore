@@ -7,3 +7,4 @@ remotion/node_modules
 remotion/public/v*.mp4
 stills/
 *.png
+v*/out/tmp.mp4
