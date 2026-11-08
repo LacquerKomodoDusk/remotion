@@ -1,0 +1,345 @@
+{
+ "frames": 1408,
+ "concept": "tabloid",
+ "words": [
+  {
+   "text": "куда",
+   "s": 0.82,
+   "e": 1.02,
+   "emotion": "panic",
+   "flags": []
+  },
+  {
+   "text": "б****",
+   "s": 1.02,
+   "e": 1.3,
+   "emotion": "panic",
+   "flags": [
+    "mat"
+   ]
+  },
+  {
+   "text": "ты",
+   "s": 1.3,
+   "e": 1.46,
+   "emotion": "panic",
+   "flags": []
+  },
+  {
+   "text": "делся",
+   "s": 1.46,
+   "e": 1.71,
+   "emotion": "panic",
+   "flags": []
+  },
+  {
+   "text": "ходят",
+   "s": 1.82,
+   "e": 2.07,
+   "emotion": "irony",
+   "flags": []
+  },
+  {
+   "text": "слухи",
+   "s": 2.14,
+   "e": 2.46,
+   "emotion": "irony",
+   "flags": []
+  },
+  {
+   "text": "что",
+   "s": 2.46,
+   "e": 2.66,
+   "emotion": "irony",
+   "flags": []
+  },
+  {
+   "text": "все",
+   "s": 2.66,
+   "e": 2.77,
+   "emotion": "irony",
+   "flags": []
+  },
+  {
+   "text": "не",
+   "s": 2.9,
+   "e": 3.14,
+   "emotion": "irony",
+   "flags": []
+  },
+  {
+   "text": "сокровища",
+   "s": 3.14,
+   "e": 3.78,
+   "emotion": "irony",
+   "flags": []
+  },
+  {
+   "text": "ищут",
+   "s": 3.78,
+   "e": 4.18,
+   "emotion": "irony",
+   "flags": []
+  },
+  {
+   "text": "а",
+   "s": 4.26,
+   "e": 4.5,
+   "emotion": "irony",
+   "flags": []
+  },
+  {
+   "text": "спокойную",
+   "s": 4.5,
+   "e": 5.1,
+   "emotion": "irony",
+   "flags": []
+  },
+  {
+   "text": "катку",
+   "s": 5.1,
+   "e": 5.4,
+   "emotion": "irony",
+   "flags": []
+  },
+  {
+   "text": "без",
+   "s": 5.5,
+   "e": 5.61,
+   "emotion": "irony",
+   "flags": []
+  },
+  {
+   "text": "тебя",
+   "s": 5.7,
+   "e": 5.95,
+   "emotion": "irony",
+   "flags": [
+    "shout"
+   ]
+  },
+  {
+   "text": "опа",
+   "s": 12.2,
+   "e": 12.44,
+   "emotion": "confident",
+   "flags": []
+  },
+  {
+   "text": "ты",
+   "s": 12.44,
+   "e": 12.84,
+   "emotion": "confident",
+   "flags": []
+  },
+  {
+   "text": "видел",
+   "s": 12.84,
+   "e": 13.16,
+   "emotion": "confident",
+   "flags": []
+  },
+  {
+   "text": "какой",
+   "s": 14.6,
+   "e": 14.96,
+   "emotion": "confident",
+   "flags": []
+  },
+  {
+   "text": "опасный",
+   "s": 14.96,
+   "e": 15.4,
+   "emotion": "confident",
+   "flags": []
+  },
+  {
+   "text": "ой",
+   "s": 17.04,
+   "e": 17.3,
+   "emotion": "panic",
+   "flags": [
+    "shout"
+   ]
+  },
+  {
+   "text": "б****",
+   "s": 17.92,
+   "e": 18.4,
+   "emotion": "anger",
+   "flags": [
+    "mat"
+   ]
+  },
+  {
+   "text": "иди",
+   "s": 18.56,
+   "e": 18.92,
+   "emotion": "anger",
+   "flags": []
+  },
+  {
+   "text": "н****",
+   "s": 18.92,
+   "e": 19.35,
+   "emotion": "anger",
+   "flags": [
+    "mat",
+    "shout"
+   ]
+  },
+  {
+   "text": "просто",
+   "s": 19.48,
+   "e": 19.9,
+   "emotion": "anger",
+   "flags": []
+  },
+  {
+   "text": "16",
+   "s": 20.6,
+   "e": 21.0,
+   "emotion": "anger",
+   "flags": [
+    "shout"
+   ]
+  },
+  {
+   "text": "хп",
+   "s": 21.12,
+   "e": 21.4,
+   "emotion": "anger",
+   "flags": []
+  },
+  {
+   "text": "б****",
+   "s": 21.48,
+   "e": 21.8,
+   "emotion": "anger",
+   "flags": [
+    "mat"
+   ]
+  }
+ ],
+ "layouts": [
+  [
+   0,
+   "split"
+  ],
+  [
+   1.8,
+   "cam_full"
+  ],
+  [
+   6.4,
+   "split"
+  ],
+  [
+   12.1,
+   "game_full"
+  ],
+  [
+   17.6,
+   "cam_full"
+  ],
+  [
+   19.4,
+   "split"
+  ]
+ ],
+ "gameFull": [
+  164,
+  604,
+  580,
+  1028
+ ],
+ "gameKeys": [
+  [
+   12.1,
+   1.0,
+   0.5,
+   0.45
+  ],
+  [
+   15.4,
+   1.2,
+   0.5,
+   0.4
+  ],
+  [
+   17.5,
+   1.2,
+   0.5,
+   0.4
+  ],
+  [
+   17.6,
+   1.0,
+   0.5,
+   0.5
+  ]
+ ],
+ "punches": [
+  [
+   1.02,
+   "cam",
+   0.1
+  ],
+  [
+   15.6,
+   "game",
+   0.1
+  ],
+  [
+   17.04,
+   "game",
+   0.14
+  ],
+  [
+   17.92,
+   "cam",
+   0.14
+  ],
+  [
+   20.6,
+   "cam",
+   0.1
+  ]
+ ],
+ "shake": [
+  [
+   17.0,
+   17.6,
+   12
+  ]
+ ],
+ "loud": [
+  [
+   15.0,
+   17.6
+  ]
+ ],
+ "sfx": [
+  [
+   "whoosh",
+   12.0
+  ],
+  [
+   "sub",
+   17.04,
+   0.35
+  ],
+  [
+   "whoosh",
+   17.5
+  ],
+  [
+   "shutter",
+   21.3
+  ]
+ ],
+ "punch": {
+  "t": 21.3
+ },
+ "dur": 23.466666666666665
+}

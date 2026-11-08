@@ -1,0 +1,9 @@
+v*/input/
+v*/work/*.wav
+v*/work/*.mp4
+v*/work/frames/
+v*/work/*.jpg
+remotion/node_modules
+remotion/public/v*.mp4
+stills/
+*.png

@@ -1,0 +1,286 @@
+{
+ "frames": 1453,
+ "concept": "cctv",
+ "words": [
+  {
+   "text": "на",
+   "s": 2.98,
+   "e": 3.1,
+   "emotion": "confident",
+   "flags": []
+  },
+  {
+   "text": "втором?",
+   "s": 3.1,
+   "e": 3.6,
+   "emotion": "confident",
+   "flags": []
+  },
+  {
+   "text": "ах",
+   "s": 7.89,
+   "e": 8.04,
+   "emotion": "anger",
+   "flags": [
+    "shout"
+   ]
+  },
+  {
+   "text": "ты",
+   "s": 8.13,
+   "e": 8.4,
+   "emotion": "anger",
+   "flags": [
+    "shout"
+   ]
+  },
+  {
+   "text": "так",
+   "s": 10.92,
+   "e": 11.1,
+   "emotion": "neutral",
+   "flags": []
+  },
+  {
+   "text": "подожди",
+   "s": 11.12,
+   "e": 11.52,
+   "emotion": "neutral",
+   "flags": []
+  },
+  {
+   "text": "это",
+   "s": 11.52,
+   "e": 11.76,
+   "emotion": "neutral",
+   "flags": []
+  },
+  {
+   "text": "не",
+   "s": 11.76,
+   "e": 11.89,
+   "emotion": "neutral",
+   "flags": []
+  },
+  {
+   "text": "тот",
+   "s": 11.92,
+   "e": 12.3,
+   "emotion": "neutral",
+   "flags": []
+  },
+  {
+   "text": "а",
+   "s": 13.24,
+   "e": 13.36,
+   "emotion": "irony",
+   "flags": []
+  },
+  {
+   "text": "ты",
+   "s": 13.72,
+   "e": 13.88,
+   "emotion": "irony",
+   "flags": []
+  },
+  {
+   "text": "думал",
+   "s": 13.88,
+   "e": 14.16,
+   "emotion": "irony",
+   "flags": []
+  },
+  {
+   "text": "я",
+   "s": 14.16,
+   "e": 14.32,
+   "emotion": "irony",
+   "flags": []
+  },
+  {
+   "text": "вебку",
+   "s": 14.32,
+   "e": 14.6,
+   "emotion": "irony",
+   "flags": []
+  },
+  {
+   "text": "включу?",
+   "s": 14.72,
+   "e": 15.2,
+   "emotion": "irony",
+   "flags": []
+  },
+  {
+   "text": "б****",
+   "s": 17.26,
+   "e": 17.6,
+   "emotion": "panic",
+   "flags": [
+    "mat"
+   ]
+  },
+  {
+   "text": "ХА-ХА",
+   "s": 18.1,
+   "e": 18.68,
+   "emotion": "joy",
+   "flags": [
+    "stretch"
+   ]
+  },
+  {
+   "text": "нет",
+   "s": 22.28,
+   "e": 22.6,
+   "emotion": "neutral",
+   "flags": []
+  },
+  {
+   "text": "там",
+   "s": 22.6,
+   "e": 22.74,
+   "emotion": "neutral",
+   "flags": []
+  },
+  {
+   "text": "ничего",
+   "s": 23.08,
+   "e": 23.51,
+   "emotion": "neutral",
+   "flags": []
+  },
+  {
+   "text": "пишет",
+   "s": 23.56,
+   "e": 23.9,
+   "emotion": "neutral",
+   "flags": []
+  }
+ ],
+ "layouts": [
+  [
+   0,
+   "split"
+  ],
+  [
+   2.8,
+   "game_full"
+  ],
+  [
+   7.7,
+   "split"
+  ],
+  [
+   10.8,
+   "cam_full"
+  ],
+  [
+   15.4,
+   "game_full"
+  ],
+  [
+   17.6,
+   "cam_full"
+  ],
+  [
+   19.6,
+   "split"
+  ]
+ ],
+ "gameFull": [
+  164,
+  604,
+  580,
+  1028
+ ],
+ "gameKeys": [
+  [
+   2.8,
+   1.0,
+   0.5,
+   0.45
+  ],
+  [
+   7.6,
+   1.1,
+   0.5,
+   0.45
+  ],
+  [
+   15.4,
+   1.0,
+   0.5,
+   0.5
+  ],
+  [
+   17.5,
+   1.25,
+   0.5,
+   0.55
+  ],
+  [
+   17.6,
+   1.0,
+   0.5,
+   0.5
+  ]
+ ],
+ "punches": [
+  [
+   7.89,
+   "cam",
+   0.12
+  ],
+  [
+   17.26,
+   "cam",
+   0.16
+  ],
+  [
+   17.5,
+   "game",
+   0.12
+  ]
+ ],
+ "shake": [
+  [
+   17.45,
+   17.6,
+   14
+  ]
+ ],
+ "loud": [
+  [
+   16.6,
+   17.6
+  ]
+ ],
+ "cctv": {
+  "t0": 15.4,
+  "t1": 17.6
+ },
+ "sfx": [
+  [
+   "whoosh",
+   2.7
+  ],
+  [
+   "whoosh",
+   15.3
+  ],
+  [
+   "sub",
+   17.5,
+   0.35
+  ],
+  [
+   "alarm",
+   20.0
+  ]
+ ],
+ "punch": {
+  "t": 20.0
+ },
+ "dur": 24.216666666666665
+}
