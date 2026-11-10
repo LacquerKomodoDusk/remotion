@@ -120,6 +120,27 @@ C[10]={"frames":1069,"concept":"ammo","shots":[15.62,15.95,16.15,16.32,16.47,16.
  "punches":[[7.3,'game',0.10],[9.9,'cam',0.10],[13.34,'cam',0.12]],"shake":[[7.3,7.7,8]],
  "loud":[[0,8.1],[14.4,16.9]],"sfx":[["whoosh",8.0],["whoosh",14.3],["buzz",16.9]],
  "punch":{"t":16.9}}
+# v11 — mansion, shooting down from the balcony: knocks, triple elimination, «всех е***** жёстко» (two .mov halves joined)
+C[11]={"frames":1632,"concept":"ticket",
+ "words":[W("у",0.43,0.55),W("нас",0.55,0.75),W("у",0.79,0.87),W("нас",0.87,1.05),
+          W("б****",13.56,13.72,'anger','mat'),W("вылези",13.8,14.2,'anger'),W("ты",14.24,14.38,'anger'),W("н****",14.44,14.85,'anger','mat,shout'),
+          W("всех",24.26,24.58,'joy'),W("е*****",24.7,25.3,'joy','mat'),W("жёстко",25.46,25.95,'joy','shout')],
+ "layouts":[[0,'split'],[2.0,'game_full'],[13.3,'cam_full'],[15.0,'game_full'],[20.9,'split']],
+ "gameFull":GF,"gameKeys":[[2.0,1.0,0.5,0.45],[13.2,1.15,0.5,0.45],[15.0,1.0,0.5,0.45],[19.8,1.2,0.5,0.45],[20.8,1.2,0.5,0.45],[20.9,1.0,0.5,0.5]],
+ "punches":[[6.7,'game',0.10],[14.44,'cam',0.12],[20.0,'game',0.14],[25.46,'cam',0.10]],"shake":[[6.6,7.1,8]],
+ "loud":[[2.0,13.3],[15.0,20.9]],"sfx":[["whoosh",1.9],["whoosh",14.9],["sub",20.0,0.3],["whoosh",20.9],["bell",21.0]],
+ "punch":{"t":21.0}}
+# v12 — «у меня трое в доме, пацаны» → «минус сквад» → «они на Sony PlayStation играли, что ли?» (two halves joined)
+C[12]={"frames":1796,"concept":"trophy",
+ "words":[W("б****",0.54,0.7,'panic','mat'),W("у",0.74,0.82,'panic'),W("меня",0.82,0.98,'panic'),W("трое",1.02,1.26,'panic'),W("в",1.3,1.36,'panic'),W("доме",1.38,1.62,'panic'),W("пацаны",1.7,2.05,'panic','shout'),
+          W("они",12.99,13.23,'anger'),W("е******",13.31,13.83,'anger','mat'),W("б****",13.87,14.1,'anger','mat'),
+          W("б****",18.62,18.8,'joy','mat'),W("минус",18.94,19.2,'joy'),W("сквад",19.26,19.55,'joy','shout'),W("н****",19.62,19.9,'joy','mat'),
+          W("они",25.59,25.75,'irony'),W("на",25.79,25.9,'irony'),W("Sony",25.95,26.2,'irony'),W("PlayStation",26.27,26.83,'irony'),W("играли",26.91,27.17,'irony'),W("что",27.27,27.35,'irony'),W("ли?",27.39,27.5,'irony'),W("б****",27.55,27.8,'irony','mat')],
+ "layouts":[[0,'split'],[2.4,'game_full'],[12.8,'cam_full'],[14.4,'game_full'],[18.4,'split']],
+ "gameFull":GF,"gameKeys":[[2.4,1.0,0.5,0.45],[12.7,1.15,0.5,0.45],[14.4,1.0,0.5,0.45],[18.3,1.15,0.5,0.45],[18.4,1.0,0.5,0.5]],
+ "punches":[[0.54,'cam',0.08],[13.31,'cam',0.12],[19.26,'cam',0.14],[26.27,'cam',0.08]],
+ "loud":[[2.4,12.8],[14.4,18.4]],"sfx":[["whoosh",2.3],["whoosh",14.3],["whoosh",18.3],["chime",20.4]],
+ "punch":{"t":20.4}}
 for k,v in [(k,C[k]) for k in (sys.argv[1:] and map(int,sys.argv[1:]) or C)]:
   v["dur"]=v["frames"]/60
   json.dump(v,open(f'/home/user/remotion/shorts3/remotion/src/configs/v{k}.json','w'),ensure_ascii=False,indent=1)

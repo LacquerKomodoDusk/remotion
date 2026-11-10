@@ -343,8 +343,54 @@ const Ammo: React.FC<P> = ({cfg, t, fps}) => {
 	return <>{els}</>;
 };
 
+// ---------------- v11: theatre ticket, he shoots from the balcony ----------------
+const Ticket: React.FC<P> = ({cfg, t, fps}) => {
+	const lf = (t - cfg.punch.t) * fps;
+	if (lf < 0) return null;
+	const tear = interpolate(lf, [40, 52], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+	return (
+		<Slot lf={lf} fps={fps}>
+			<div style={{display: 'flex', filter: `drop-shadow(0 14px 0 ${NAVY})`}}>
+				<div style={{flex: 1, minWidth: 0, overflow: 'hidden', background: '#7A1022', border: `7px solid ${NAVY}`, borderRight: 'none', borderRadius: '26px 0 0 26px', padding: '22px 28px 26px'}}>
+					<div style={txt(30, GOLD, {letterSpacing: '0.2em'})}>ТЕАТР · БИЛЕТ</div>
+					<div style={txt(58, '#FFF3DC', {marginTop: 12})}>БАЛКОН</div>
+					<div style={txt(30, '#E9C9A8', {marginTop: 8})}>ряд 1 · место 1</div>
+					<div style={txt(32, '#FFF3DC', {marginTop: 16})}>в программе:</div>
+					<div style={txt(34, GOLD, {marginTop: 6})}>«Тройное устранение»</div>
+				</div>
+				<div style={{width: 92, flexShrink: 0, background: '#7A1022', border: `7px solid ${NAVY}`, borderLeft: `6px dashed ${GOLD}`, borderRadius: '0 26px 26px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', transform: `translate(${tear * 30}px, ${tear * 40}px) rotate(${tear * 14}deg)`, opacity: 1 - tear * 0.15}}>
+					<span style={txt(26, GOLD, {transform: 'rotate(-90deg)', letterSpacing: '0.12em'})}>КОНТРОЛЬ</span>
+				</div>
+			</div>
+		</Slot>
+	);
+};
+
+// ---------------- v12: console-style trophy pop ----------------
+const Trophy: React.FC<P> = ({cfg, t, fps}) => {
+	const lf = (t - cfg.punch.t) * fps;
+	if (lf < 0) return null;
+	const slide = interpolate(spring({frame: lf, fps, config: {damping: 14, stiffness: 160}}), [0, 1], [-900, 0]);
+	const shine = interpolate(lf, [10, 40], [-200, 900], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+	return (
+		<div style={{position: 'absolute', left: 60, top: 1010, width: 840, transform: `translateX(${slide}px)`}}>
+			<div style={{...plate, background: 'linear-gradient(135deg, #1A1F2E, #2B3350)', padding: '22px 26px', display: 'flex', alignItems: 'center', gap: 24, position: 'relative', overflow: 'hidden'}}>
+				<div style={{width: 120, height: 120, borderRadius: 60, background: 'radial-gradient(circle at 35% 30%, #FFE9A3, #E0A21B 60%, #9A6A0A)', border: `6px solid ${NAVY}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
+					<svg width="68" height="68" viewBox="0 0 24 24"><path fill={NAVY} d="M7 2h10v2h4v3a5 5 0 0 1-4.6 5A5 5 0 0 1 13 15.9V18h3v3H8v-3h3v-2.1A5 5 0 0 1 7.6 12 5 5 0 0 1 3 7V4h4zm-2 4v1a3 3 0 0 0 2 2.8V6zm14 0h-2v3.8A3 3 0 0 0 19 7z" /></svg>
+				</div>
+				<div>
+					<div style={txt(28, '#AEB6CC', {letterSpacing: '0.14em'})}>ТРОФЕЙ ПОЛУЧЕН</div>
+					<div style={txt(56, '#FFFFFF', {marginTop: 8})}>Минус сквад</div>
+					<div style={txt(32, GOLD, {marginTop: 8})}>трое в доме → ноль в доме</div>
+				</div>
+				<div style={{position: 'absolute', top: 0, bottom: 0, left: shine, width: 90, background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.22), transparent)', transform: 'skewX(-20deg)'}} />
+			</div>
+		</div>
+	);
+};
+
 export const Concept: React.FC<P> = (p) => {
-	const m: Record<string, React.FC<P>> = {airport: Airport, tir: Tir, tabloid: Tabloid, cctv: Cctv, museum: Museum, captcha: Captcha, jar: Jar, tip: Tip, protocol: Protocol, ammo: Ammo};
+	const m: Record<string, React.FC<P>> = {airport: Airport, tir: Tir, tabloid: Tabloid, cctv: Cctv, museum: Museum, captcha: Captcha, jar: Jar, tip: Tip, protocol: Protocol, ammo: Ammo, ticket: Ticket, trophy: Trophy};
 	const C = m[p.cfg.concept];
 	return C ? <C {...p} /> : null;
 };
