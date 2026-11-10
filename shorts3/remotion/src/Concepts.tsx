@@ -281,8 +281,70 @@ const Tip: React.FC<P> = ({cfg, t, fps}) => {
 	return <>{els}</>;
 };
 
+// ---------------- v9: police report, the tree as the suspect ----------------
+const Protocol: React.FC<P> = ({cfg, t, fps}) => {
+	const lf = (t - cfg.punch.t) * fps;
+	if (lf < 0) return null;
+	const st = lf - 50;
+	return (
+		<Slot lf={lf} fps={fps}>
+			<div style={{...plate, background: '#F2EEE3', padding: '24px 30px 30px', position: 'relative'}}>
+				<div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', borderBottom: `4px solid ${NAVY}`, paddingBottom: 12}}>
+					<span style={txt(40, NAVY, {letterSpacing: '0.1em'})}>ПРОТОКОЛ</span>
+					<span style={txt(34, '#6B6656')}>№ 14</span>
+				</div>
+				<div style={{display: 'flex', alignItems: 'baseline', gap: 16, marginTop: 18}}>
+					<span style={txt(34, '#6B6656')}>виновник:</span>
+					<span style={txt(60, NAVY)}>дерево</span>
+				</div>
+				<div style={txt(28, '#8C8676', {marginTop: 10})}>со слов пострадавшего</div>
+				{st >= 0 ? (
+					<div style={{display: 'table', margin: '18px 0 0 auto', transform: `rotate(-8deg) scale(${interpolate(st, [0, 5, 10], [1.8, 0.92, 1], {extrapolateRight: 'clamp'})})`, opacity: Math.min(1, st / 3), border: `6px solid ${RED}`, borderRadius: 12, padding: '6px 16px'}}>
+						<span style={txt(42, RED, {letterSpacing: '0.06em'})}>ОПРАВДАНО</span>
+					</div>
+				) : <div style={{height: 82}} />}
+			</div>
+		</Slot>
+	);
+};
+
+// ---------------- v10: shot counter vs «тремя патронами» ----------------
+const Ammo: React.FC<P> = ({cfg, t, fps}) => {
+	const shots = cfg.shots as number[];
+	const n = shots.filter((s) => t >= s).length;
+	const els: React.ReactNode[] = [];
+	if (n > 0 && t < cfg.punch.t) {
+		const last = shots[n - 1];
+		const bump = interpolate((t - last) * fps, [0, 3, 10], [1.22, 0.95, 1], {extrapolateRight: 'clamp'});
+		const over = n > 3;
+		els.push(
+			<div key="cnt" style={{position: 'absolute', left: 60, top: 240, transform: `scale(${bump})`, transformOrigin: '0 50%', ...plate, borderRadius: 20, background: over ? RED : '#F4F1E8', padding: '10px 22px', display: 'flex', alignItems: 'baseline', gap: 14}}>
+				<span style={txt(30, over ? '#FFFFFF' : NAVY, {letterSpacing: '0.1em'})}>ПАТРОНЫ</span>
+				<span style={txt(64, over ? '#FFFFFF' : NAVY)}>{n}</span>
+				<span style={txt(40, over ? '#FFD9D6' : '#6B6656')}>/ 3</span>
+			</div>,
+		);
+	}
+	const lf = (t - cfg.punch.t) * fps;
+	if (lf >= 0) {
+		els.push(
+			<Slot key="card" lf={lf} fps={fps}>
+				<div style={{...plate, background: '#F4F1E8', padding: '22px 30px 26px'}}>
+					{[['обещано', '3', NAVY], ['потрачено', String(shots.length), NAVY], ['посажено', '0', RED]].map(([k, v, c], i) => (
+						<div key={k} style={{display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginTop: i ? 8 : 0, opacity: lf > i * 7 ? 1 : 0}}>
+							<span style={txt(40, '#6B6656')}>{k}</span>
+							<span style={txt(62, c)}>{v}</span>
+						</div>
+					))}
+				</div>
+			</Slot>,
+		);
+	}
+	return <>{els}</>;
+};
+
 export const Concept: React.FC<P> = (p) => {
-	const m: Record<string, React.FC<P>> = {airport: Airport, tir: Tir, tabloid: Tabloid, cctv: Cctv, museum: Museum, captcha: Captcha, jar: Jar, tip: Tip};
+	const m: Record<string, React.FC<P>> = {airport: Airport, tir: Tir, tabloid: Tabloid, cctv: Cctv, museum: Museum, captcha: Captcha, jar: Jar, tip: Tip, protocol: Protocol, ammo: Ammo};
 	const C = m[p.cfg.concept];
 	return C ? <C {...p} /> : null;
 };
