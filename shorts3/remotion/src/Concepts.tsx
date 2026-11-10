@@ -2,6 +2,7 @@ import React from 'react';
 import {Easing, interpolate, spring} from 'remotion';
 import type {Cfg} from './Edit';
 import {FONT, NAVY} from './theme';
+import {Stage, TreeGavel, Shells, Chandelier, Cup} from './Three3D';
 
 // Per-video "seasoning": one concept each + the ONE editorial caption (punchline).
 // Concept colours never reuse the subtitle emotion colours as text colour on purpose.
@@ -281,111 +282,83 @@ const Tip: React.FC<P> = ({cfg, t, fps}) => {
 	return <>{els}</>;
 };
 
-// ---------------- v9: police report, the tree as the suspect ----------------
+// ---------------- v9–v12: 3D props + outlined caption (no plates) ----------------
+const stroke = {WebkitTextStroke: `8px ${NAVY}`, paintOrder: 'stroke fill', textShadow: `0 5px 0 ${NAVY}`} as React.CSSProperties;
+// caption block centred on the non-safe-zone width (0–918), lines pop in one after another
+const Cap: React.FC<{lf: number; fps: number; top: number; lines: [string, number, string][]; step?: number}> = ({lf, fps, top, lines, step = 6}) => (
+	<div style={{position: 'absolute', left: 30, width: 858, top, textAlign: 'center'}}>
+		{lines.map(([text, size, color], i) => {
+			const l = lf - i * step;
+			if (l < 0) return <div key={i} style={{height: size * 1.32}} />;
+			const {s: sc, o} = popIn(l, fps);
+			return <div key={i} style={{...txt(size, color, stroke), lineHeight: 1.32, transform: `scale(${sc})`, opacity: o}}>{text}</div>;
+		})}
+	</div>
+);
+
 const Protocol: React.FC<P> = ({cfg, t, fps}) => {
 	const lf = (t - cfg.punch.t) * fps;
 	if (lf < 0) return null;
-	const st = lf - 50;
+	const hit = 50;
+	const st = lf - hit;
 	return (
-		<Slot lf={lf} fps={fps}>
-			<div style={{...plate, background: '#F2EEE3', padding: '24px 30px 30px', position: 'relative'}}>
-				<div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', borderBottom: `4px solid ${NAVY}`, paddingBottom: 12}}>
-					<span style={txt(40, NAVY, {letterSpacing: '0.1em'})}>ПРОТОКОЛ</span>
-					<span style={txt(34, '#6B6656')}>№ 14</span>
-				</div>
-				<div style={{display: 'flex', alignItems: 'baseline', gap: 16, marginTop: 18}}>
-					<span style={txt(34, '#6B6656')}>виновник:</span>
-					<span style={txt(60, NAVY)}>дерево</span>
-				</div>
-				<div style={txt(28, '#8C8676', {marginTop: 10})}>со слов пострадавшего</div>
-				{st >= 0 ? (
-					<div style={{display: 'table', margin: '18px 0 0 auto', transform: `rotate(-8deg) scale(${interpolate(st, [0, 5, 10], [1.8, 0.92, 1], {extrapolateRight: 'clamp'})})`, opacity: Math.min(1, st / 3), border: `6px solid ${RED}`, borderRadius: 12, padding: '6px 16px'}}>
-						<span style={txt(42, RED, {letterSpacing: '0.06em'})}>ОПРАВДАНО</span>
+		<>
+			<Stage><TreeGavel lf={lf} fps={fps} hit={hit} at={[459, 1000]} /></Stage>
+			<Cap lf={lf - 8} fps={fps} top={1230} lines={[['виновник:', 36, '#FFFFFF'], ['ДЕРЕВО', 76, '#7CFF6B'], ['со слов пострадавшего', 30, '#E6E9F2']]} />
+			{st >= 0 ? (
+				<div style={{position: 'absolute', left: 0, width: 918, top: 1120, display: 'flex', justifyContent: 'center'}}>
+					<div style={{transform: `rotate(-9deg) scale(${interpolate(st, [0, 4, 10], [2, 0.9, 1], {extrapolateRight: 'clamp'})})`, opacity: Math.min(1, st / 2), border: `8px solid ${RED}`, borderRadius: 14, padding: '6px 20px', background: 'rgba(255,255,255,0.92)', boxShadow: `0 8px 0 ${NAVY}`}}>
+						<span style={txt(58, RED, {letterSpacing: '0.06em'})}>ОПРАВДАНО</span>
 					</div>
-				) : <div style={{height: 82}} />}
-			</div>
-		</Slot>
+				</div>
+			) : null}
+		</>
 	);
 };
 
-// ---------------- v10: shot counter vs «тремя патронами» ----------------
 const Ammo: React.FC<P> = ({cfg, t, fps}) => {
 	const shots = cfg.shots as number[];
 	const n = shots.filter((s) => t >= s).length;
-	const els: React.ReactNode[] = [];
-	if (n > 0 && t < cfg.punch.t) {
-		const last = shots[n - 1];
-		const bump = interpolate((t - last) * fps, [0, 3, 10], [1.22, 0.95, 1], {extrapolateRight: 'clamp'});
-		const over = n > 3;
-		els.push(
-			<div key="cnt" style={{position: 'absolute', left: 60, top: 240, transform: `scale(${bump})`, transformOrigin: '0 50%', ...plate, borderRadius: 20, background: over ? RED : '#F4F1E8', padding: '10px 22px', display: 'flex', alignItems: 'baseline', gap: 14}}>
-				<span style={txt(30, over ? '#FFFFFF' : NAVY, {letterSpacing: '0.1em'})}>ПАТРОНЫ</span>
-				<span style={txt(64, over ? '#FFFFFF' : NAVY)}>{n}</span>
-				<span style={txt(40, over ? '#FFD9D6' : '#6B6656')}>/ 3</span>
-			</div>,
-		);
-	}
+	if (n === 0) return null;
 	const lf = (t - cfg.punch.t) * fps;
-	if (lf >= 0) {
-		els.push(
-			<Slot key="card" lf={lf} fps={fps}>
-				<div style={{...plate, background: '#F4F1E8', padding: '22px 30px 26px'}}>
-					{[['обещано', '3', NAVY], ['потрачено', String(shots.length), NAVY], ['посажено', '0', RED]].map(([k, v, c], i) => (
-						<div key={k} style={{display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginTop: i ? 8 : 0, opacity: lf > i * 7 ? 1 : 0}}>
-							<span style={txt(40, '#6B6656')}>{k}</span>
-							<span style={txt(62, c)}>{v}</span>
-						</div>
-					))}
-				</div>
-			</Slot>,
-		);
-	}
-	return <>{els}</>;
-};
-
-// ---------------- v11: theatre ticket, he shoots from the balcony ----------------
-const Ticket: React.FC<P> = ({cfg, t, fps}) => {
-	const lf = (t - cfg.punch.t) * fps;
-	if (lf < 0) return null;
-	const tear = interpolate(lf, [40, 52], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+	// the row lives at the top while he shoots (game_full), drops into the game area for the card (split)
+	const rowY = interpolate(lf, [0, 12], [330, 1060], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.inOut(Easing.cubic)});
+	const last = shots[n - 1];
+	const bump = interpolate((t - last) * fps, [0, 3, 10], [1.25, 0.95, 1], {extrapolateRight: 'clamp'});
 	return (
-		<Slot lf={lf} fps={fps}>
-			<div style={{display: 'flex', filter: `drop-shadow(0 14px 0 ${NAVY})`}}>
-				<div style={{flex: 1, minWidth: 0, overflow: 'hidden', background: '#7A1022', border: `7px solid ${NAVY}`, borderRight: 'none', borderRadius: '26px 0 0 26px', padding: '22px 28px 26px'}}>
-					<div style={txt(30, GOLD, {letterSpacing: '0.2em'})}>ТЕАТР · БИЛЕТ</div>
-					<div style={txt(58, '#FFF3DC', {marginTop: 12})}>БАЛКОН</div>
-					<div style={txt(30, '#E9C9A8', {marginTop: 8})}>ряд 1 · место 1</div>
-					<div style={txt(32, '#FFF3DC', {marginTop: 16})}>в программе:</div>
-					<div style={txt(34, GOLD, {marginTop: 6})}>«Тройное устранение»</div>
+		<>
+			<Stage><Shells t={t} fps={fps} shots={shots} promised={3} rowY={rowY} /></Stage>
+			{lf < 0 ? (
+				<div style={{position: 'absolute', left: 0, width: 918, top: 440, textAlign: 'center', transform: `scale(${bump})`}}>
+					<span style={txt(84, n > 3 ? '#FF3B3B' : '#FFFFFF', stroke)}>{n}</span>
+					<span style={txt(52, '#FFFFFF', stroke)}> / 3</span>
 				</div>
-				<div style={{width: 92, flexShrink: 0, background: '#7A1022', border: `7px solid ${NAVY}`, borderLeft: `6px dashed ${GOLD}`, borderRadius: '0 26px 26px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', transform: `translate(${tear * 30}px, ${tear * 40}px) rotate(${tear * 14}deg)`, opacity: 1 - tear * 0.15}}>
-					<span style={txt(26, GOLD, {transform: 'rotate(-90deg)', letterSpacing: '0.12em'})}>КОНТРОЛЬ</span>
-				</div>
-			</div>
-		</Slot>
+			) : (
+				<Cap lf={lf - 8} fps={fps} top={1250} lines={[['обещано 3 · потрачено 7', 44, '#FFFFFF'], ['посажено: 0', 76, '#FF3B3B']]} step={8} />
+			)}
+		</>
 	);
 };
 
-// ---------------- v12: console-style trophy pop ----------------
+const Ticket: React.FC<P> = ({cfg, t, fps}) => {
+	const lf = (t - cfg.punch.t) * fps;
+	if (lf < 0) return null;
+	return (
+		<>
+			<Stage><Chandelier lf={lf} fps={fps} at={[459, 1010]} /></Stage>
+			<Cap lf={lf - 10} fps={fps} top={1230} lines={[['БАЛКОН · ряд 1', 40, '#FFFFFF'], ['в программе:', 32, '#E6E9F2'], ['«Тройное устранение»', 58, '#FFC83D']]} />
+		</>
+	);
+};
+
 const Trophy: React.FC<P> = ({cfg, t, fps}) => {
 	const lf = (t - cfg.punch.t) * fps;
 	if (lf < 0) return null;
-	const slide = interpolate(spring({frame: lf, fps, config: {damping: 14, stiffness: 160}}), [0, 1], [-900, 0]);
-	const shine = interpolate(lf, [10, 40], [-200, 900], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
 	return (
-		<div style={{position: 'absolute', left: 60, top: 1010, width: 840, transform: `translateX(${slide}px)`}}>
-			<div style={{...plate, background: 'linear-gradient(135deg, #1A1F2E, #2B3350)', padding: '22px 26px', display: 'flex', alignItems: 'center', gap: 24, position: 'relative', overflow: 'hidden'}}>
-				<div style={{width: 120, height: 120, borderRadius: 60, background: 'radial-gradient(circle at 35% 30%, #FFE9A3, #E0A21B 60%, #9A6A0A)', border: `6px solid ${NAVY}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
-					<svg width="68" height="68" viewBox="0 0 24 24"><path fill={NAVY} d="M7 2h10v2h4v3a5 5 0 0 1-4.6 5A5 5 0 0 1 13 15.9V18h3v3H8v-3h3v-2.1A5 5 0 0 1 7.6 12 5 5 0 0 1 3 7V4h4zm-2 4v1a3 3 0 0 0 2 2.8V6zm14 0h-2v3.8A3 3 0 0 0 19 7z" /></svg>
-				</div>
-				<div>
-					<div style={txt(28, '#AEB6CC', {letterSpacing: '0.14em'})}>ТРОФЕЙ ПОЛУЧЕН</div>
-					<div style={txt(56, '#FFFFFF', {marginTop: 8})}>Минус сквад</div>
-					<div style={txt(32, GOLD, {marginTop: 8})}>трое в доме → ноль в доме</div>
-				</div>
-				<div style={{position: 'absolute', top: 0, bottom: 0, left: shine, width: 90, background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.22), transparent)', transform: 'skewX(-20deg)'}} />
-			</div>
-		</div>
+		<>
+			<Stage><Cup lf={lf} fps={fps} at={[459, 1000]} /></Stage>
+			<Cap lf={lf - 8} fps={fps} top={1230} lines={[['ТРОФЕЙ ПОЛУЧЕН', 36, '#E6E9F2'], ['Минус сквад', 72, '#FFFFFF'], ['трое в доме → ноль в доме', 38, '#FFC83D']]} />
+		</>
 	);
 };
 
