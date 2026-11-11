@@ -140,8 +140,8 @@ C[12]={"frames":1796,"concept":"house",
  "layouts":[[0,'split'],[2.4,'game_full'],[12.8,'cam_full'],[14.0,'game_full'],[18.4,'split']],
  "gameFull":GF,"gameKeys":[[2.4,1.0,0.5,0.45],[11.6,1.0,0.5,0.45],[12.0,1.15,0.5,0.45],[12.7,1.15,0.5,0.45],[14.0,1.0,0.5,0.45],[18.3,1.15,0.5,0.45],[18.4,1.0,0.5,0.5]],
  "punches":[[0.54,'cam',0.08],[12.0,'game',0.10],[13.31,'cam',0.12],[15.0,'game',0.10],[19.26,'cam',0.14],[26.27,'cam',0.08]],
- "loud":[[2.4,12.8],[14.0,18.4]],"sfx":[["pop",0.35],["pop",0.55],["pop",0.75],["whoosh",2.3],["pop",12.0],["whoosh",12.7],["pop",14.0],["pop",15.0],["whoosh",18.3],["boing",18.15],["pop",18.5],["whoosh",20.4]],
- "punch":{"t":20.4},"flashes":[[18.5,0.35]],"house":{"in":0.3,"out":[12.0,14.0,15.0],"extra":18.5}}
+ "loud":[[2.4,12.8],[14.0,18.4]],"sfx":[["pop",0.35],["pop",0.55],["pop",0.75],["whoosh",2.3],["pop",12.0],["whoosh",12.7],["pop",14.0],["pop",15.0],["whoosh",18.3],["boing",18.15],["pop",18.5],["whoosh",20.4],["whoosh",25.85],["pop",26.1]],
+ "punch":{"t":20.4},"flashes":[[18.5,0.35]],"house":{"in":0.3,"out":[12.0,14.0,15.0],"extra":18.5,"pad":25.95,"padShake":27.55}}
 for k,v in [(k,C[k]) for k in (sys.argv[1:] and map(int,sys.argv[1:]) or C)]:
   v["dur"]=v["frames"]/60
   json.dump(v,open(f'/home/user/remotion/shorts3/remotion/src/configs/v{k}.json','w'),ensure_ascii=False,indent=1)

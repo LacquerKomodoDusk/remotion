@@ -333,3 +333,32 @@ export const House: React.FC<{t: number; fps: number; out: number[]; extra: numb
 		</group>
 	);
 };
+
+// ---------- v12: generic gamepad (no brand shapes) for the «PlayStation?» line ----------
+export const Pad: React.FC<{lf: number; fps: number; at: [number, number]; shake: number}> = ({lf, fps, at, shake}) => {
+	const g = useMemo(() => ({
+		body: new THREE.BoxGeometry(1.1, 0.42, 0.26),
+		grip: new THREE.SphereGeometry(0.26, 24, 16),
+		dpad: new THREE.BoxGeometry(0.2, 0.06, 0.06),
+		btn: new THREE.CylinderGeometry(0.045, 0.045, 0.05, 16),
+		stick: new THREE.CylinderGeometry(0.075, 0.06, 0.08, 20),
+	}), []);
+	if (lf < 0) return null;
+	const p = spring({frame: lf, fps, config: {damping: 9, stiffness: 170}});
+	const [x, y] = px2w(at[0], at[1]);
+	const sh = Math.sin(lf * 1.7) * 0.05 * shake;
+	return (
+		<group position={[x + sh, y, 0]} scale={p * 0.85} rotation={[0.55 + Math.sin(lf / 20) * 0.08, (1 - p) * 5 + Math.sin(lf / 25) * 0.35, sh * 2]}>
+			<O geo={g.body} color="#2B2F3A" rough={0.45} />
+			<O geo={g.grip} color="#2B2F3A" rough={0.45} pos={[-0.48, -0.12, 0]} scale={[1, 1.15, 0.7]} />
+			<O geo={g.grip} color="#2B2F3A" rough={0.45} pos={[0.48, -0.12, 0]} scale={[1, 1.15, 0.7]} />
+			<O geo={g.dpad} color="#B9C0CC" pos={[-0.36, 0.05, 0.15]} line={1.12} />
+			<O geo={g.dpad} color="#B9C0CC" pos={[-0.36, 0.05, 0.15]} rot={[0, 0, Math.PI / 2]} line={1.12} />
+			{[[0.36, 0.13, '#7CFF6B'], [0.36, -0.03, '#FF3B3B'], [0.28, 0.05, '#5AC8FF'], [0.44, 0.05, '#FFD23F']].map(([bx, by, c], i) => (
+				<O key={i} geo={g.btn} color={c as string} pos={[bx as number, by as number, 0.15]} rot={[Math.PI / 2, 0, 0]} emissive="#202020" line={1.15} />
+			))}
+			<O geo={g.stick} color="#11141B" pos={[-0.17, -0.12, 0.16]} rot={[Math.PI / 2, 0, 0]} />
+			<O geo={g.stick} color="#11141B" pos={[0.17, -0.12, 0.16]} rot={[Math.PI / 2, 0, 0]} />
+		</group>
+	);
+};

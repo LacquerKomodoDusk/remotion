@@ -2,7 +2,7 @@ import React from 'react';
 import {Easing, OffthreadVideo, Sequence, interpolate, spring} from 'remotion';
 import type {Cfg} from './Edit';
 import {FONT, NAVY} from './theme';
-import {Stage, Shells, Splinters, CrownTree, Curtains, Flowers, House} from './Three3D';
+import {Stage, Shells, Splinters, CrownTree, Curtains, Flowers, House, Pad} from './Three3D';
 
 // Per-video "seasoning": one concept each + the ONE editorial caption (punchline).
 // Concept colours never reuse the subtitle emotion colours as text colour on purpose.
@@ -476,7 +476,12 @@ const HouseCount: React.FC<P> = ({cfg, t, fps}) => {
 	const lf = (t - cfg.punch.t) * fps;
 	const mv = interpolate(lf, [0, 16], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.inOut(Easing.cubic)});
 	const at: [number, number] = [lerpN(205, 459, mv), lerpN(360, 1040, mv)];
-	const els: React.ReactNode[] = [<Stage key="h"><House t={t} fps={fps} out={H.out} extra={H.extra} at={at} scale={lerpN(0.62, 1.05, mv)} inAt={H.in} /></Stage>];
+	const H2 = cfg.house as {pad: number; padShake: number};
+	const pf = (t - H2.pad) * fps;
+	const away = interpolate(pf, [0, 10], [1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.in(Easing.cubic)});
+	const els: React.ReactNode[] = [];
+	if (away > 0.01) els.push(<Stage key="h"><House t={t} fps={fps} out={H.out} extra={H.extra} at={[at[0] + (1 - away) * 520, at[1]]} scale={lerpN(0.62, 1.05, mv) * away} inAt={H.in} /></Stage>);
+	if (pf >= 0) els.push(<Stage key="pad"><Pad lf={pf} fps={fps} at={[459, 1050]} shake={t >= H2.padShake && t < H2.padShake + 0.6 ? 1 : 0} /></Stage>);
 	if (t >= H.in + 0.2 && lf < 0) {
 		const n = 3 - H.out.filter((o) => t >= o).length - (t >= H.extra ? 1 : 0);
 		const last = [...H.out, H.extra].filter((o) => t >= o).sort((a, b) => b - a)[0] ?? H.in;
