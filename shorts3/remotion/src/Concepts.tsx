@@ -470,29 +470,80 @@ const Theatre: React.FC<P> = ({cfg, t, fps, layout}) => {
 	return <>{els}</>;
 };
 
-// v12 — «трое в доме»: a 3D house with three residents leaving one per kill, then a fourth pops out of the chimney
-const HouseCount: React.FC<P> = ({cfg, t, fps}) => {
-	const H = cfg.house as {in: number; out: number[]; extra: number};
+// v12 — «трое в доме»: house counter + horror beat after the line + CoD-style hitmarkers on every hit
+const HouseCount: React.FC<P> = ({cfg, t, fps, layout}) => {
+	const H = cfg.house as {in: number; out: number[]; extra: number; pad: number; padShake: number; horror: [number, number]; scare: number; hits: number[]; kills: number[]};
 	const lf = (t - cfg.punch.t) * fps;
 	const mv = interpolate(lf, [0, 16], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.inOut(Easing.cubic)});
-	const at: [number, number] = [lerpN(205, 459, mv), lerpN(360, 1040, mv)];
-	const H2 = cfg.house as {pad: number; padShake: number};
-	const pf = (t - H2.pad) * fps;
+	let at: [number, number] = [lerpN(205, 459, mv), lerpN(360, 1040, mv)];
+	let sc = lerpN(0.62, 1.05, mv);
+	const [h0, h1] = H.horror;
+	const inH = t >= h0 && t < h1;
+	let scary = 0;
+	if (inH) {
+		scary = 1;
+		// slow creep towards the centre, then the jump-scare lunge at `scare`
+		const creep = interpolate(t, [h0, H.scare], [0, 1], {extrapolateRight: 'clamp', easing: Easing.inOut(Easing.quad)});
+		const lunge = interpolate(t, [H.scare, H.scare + 0.12], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.in(Easing.quad)});
+		at = [lerpN(205, 540, creep), lerpN(360, 1010, creep)];
+		sc = lerpN(0.62, 1.1, creep) + lunge * 3.2;
+	}
+	const pf = (t - H.pad) * fps;
 	const away = interpolate(pf, [0, 10], [1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.in(Easing.cubic)});
 	const els: React.ReactNode[] = [];
-	if (away > 0.01) els.push(<Stage key="h"><House t={t} fps={fps} out={H.out} extra={H.extra} at={[at[0] + (1 - away) * 520, at[1]]} scale={lerpN(0.62, 1.05, mv) * away} inAt={H.in} /></Stage>);
-	if (pf >= 0) els.push(<Stage key="pad"><Pad lf={pf} fps={fps} at={[459, 1050]} shake={t >= H2.padShake && t < H2.padShake + 0.6 ? 1 : 0} /></Stage>);
-	if (t >= H.in + 0.2 && lf < 0) {
+	const hz: React.ReactNode[] = [];
+	// horror overlay: cold tint, heavy vignette, flicker, red pulse on the heartbeat
+	if (inH) {
+		const k = (t - h0) * fps;
+		const flick = (Math.sin(k * 2.7) + Math.sin(k * 7.3) > 1.3) || (k > 8 && k < 11) ? 0.55 : 0;
+		const beat = Math.max(0, Math.cos(((t - h0) / 0.62) * Math.PI * 2)) ** 6;
+		const o = interpolate(t, [h0, h0 + 0.08, h1 - 0.1, h1], [0, 1, 1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+		hz.push(
+			<div key="hz" style={{position: 'absolute', inset: 0, opacity: o}}>
+				<div style={{position: 'absolute', inset: 0, background: 'rgba(10,30,25,0.35)', mixBlendMode: 'multiply'}} />
+				<div style={{position: 'absolute', inset: 0, background: `radial-gradient(ellipse at 50% 42%, rgba(0,0,0,0) 22%, rgba(0,0,0,0.92) 78%)`}} />
+				<div style={{position: 'absolute', inset: 0, background: `radial-gradient(ellipse at 50% 42%, rgba(0,0,0,0) 40%, rgba(160,0,0,${0.45 * beat}) 100%)`}} />
+				<div style={{position: 'absolute', inset: 0, background: '#000', opacity: flick}} />
+				<div style={{position: 'absolute', inset: 0, backgroundImage: 'repeating-linear-gradient(0deg, rgba(255,255,255,0.05) 0 2px, rgba(0,0,0,0) 2px 5px)'}} />
+			</div>,
+		);
+	}
+	if (away > 0.01) els.push(<Stage key="h"><House t={t} fps={fps} out={H.out} extra={H.extra} at={[at[0] + (1 - away) * 520, at[1]]} scale={sc * away} inAt={H.in} scary={scary} /></Stage>);
+	els.push(...hz);
+	if (pf >= 0) els.push(<Stage key="pad"><Pad lf={pf} fps={fps} at={[459, 1050]} shake={t >= H.padShake && t < H.padShake + 0.6 ? 1 : 0} /></Stage>);
+	if (t >= H.in + 0.2 && lf < 0 && !inH) {
 		const n = 3 - H.out.filter((o) => t >= o).length - (t >= H.extra ? 1 : 0);
-		const last = [...H.out, H.extra].filter((o) => t >= o).sort((a, b) => b - a)[0] ?? H.in;
-		const b = interpolate((t - last) * fps, [0, 4, 12], [1.3, 0.95, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+		const last = [...H.out, H.extra].filter((o) => t >= o).sort((a2, b2) => b2 - a2)[0] ?? H.in;
+		const bmp = interpolate((t - last) * fps, [0, 4, 12], [1.3, 0.95, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
 		const neg = n < 0;
 		els.push(
-			<div key="n" style={{position: 'absolute', left: 50, top: 505, transform: `scale(${b}) rotate(${neg ? Math.sin(t * 40) * 3 : 0}deg)`, transformOrigin: '0 50%', display: 'flex', alignItems: 'baseline', gap: 12}}>
+			<div key="n" style={{position: 'absolute', left: 50, top: 505, transform: `scale(${bmp}) rotate(${neg ? Math.sin(t * 40) * 3 : 0}deg)`, transformOrigin: '0 50%', display: 'flex', alignItems: 'baseline', gap: 12}}>
 				<span style={txt(30, '#FFFFFF', strokeS)}>В ДОМЕ:</span>
 				<span style={txt(66, neg ? '#FF3B3B' : n === 0 ? '#7CFF6B' : '#FFFFFF', strokeS)}>{neg ? `−${-n}` : n}</span>
 			</div>,
 		);
+	}
+	// CoD-style hitmarkers at the crosshair: white X per hit, bigger red X on knocks/kills
+	const XH: Record<string, [number, number]> = {game_full: [550, 908], split: [540, 1340], cam_full: [540, 1650]};
+	const xa = XH[layout.from], xb = XH[layout.to];
+	const cx = lerpN(xa[0], xb[0], layout.p), cy = lerpN(xa[1], xb[1], layout.p);
+	for (const [list, kill] of [[H.hits, false], [H.kills, true]] as [number[], boolean][]) {
+		for (const h of list) {
+			const k = (t - h) * fps;
+			if (k < 0 || k > (kill ? 16 : 9)) continue;
+			const p = kill ? interpolate(k, [0, 3, 16], [1.5, 1.0, 1.1]) : interpolate(k, [0, 2, 9], [1.35, 1, 1]);
+			const o = interpolate(k, kill ? [10, 16] : [5, 9], [1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+			const col = kill ? '#FF2A2A' : '#FFFFFF';
+			const gap = kill ? 22 : 16, len = kill ? 40 : 28, w = kill ? 9 : 6;
+			els.push(
+				<svg key={`hm${h}`} width={240} height={240} style={{position: 'absolute', left: cx - 120, top: cy - 120, opacity: o, transform: `scale(${p})`, filter: `drop-shadow(0 0 3px rgba(0,0,0,0.9))`}}>
+					{[45, 135, 225, 315].map((a2) => {
+						const r = (a2 * Math.PI) / 180;
+						return <line key={a2} x1={120 + Math.cos(r) * gap} y1={120 + Math.sin(r) * gap} x2={120 + Math.cos(r) * (gap + len)} y2={120 + Math.sin(r) * (gap + len)} stroke={col} strokeWidth={w} strokeLinecap="square" />;
+					})}
+				</svg>,
+			);
+		}
 	}
 	if (lf >= 0) els.push(<Cap key="cap" lf={lf - 12} fps={fps} top={1265} lines={[['«трое в доме»', 44, '#FFFFFF'], ['их было ЧЕТВЕРО', 64, '#FF3B3B']]} step={9} />);
 	return <>{els}</>;

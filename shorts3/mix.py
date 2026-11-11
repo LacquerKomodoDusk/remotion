@@ -12,6 +12,7 @@ def add(sig,t0,g=1.0):
 g=np.full(N,0.6)
 for w in words: g[max(0,int((w['s']-0.06)*SR)):int((w['e']+0.10)*SR)]=1.0
 for a,b in cfg.get('loud',[]): g[int(a*SR):int(b*SR)]=np.maximum(g[int(a*SR):int(b*SR)],0.85)
+for a,b,d in cfg.get('duck',[]): g[int(a*SR):int(b*SR)]=d
 k=int(.04*SR); g=np.convolve(g,np.ones(k)/k,mode='same'); y*=g[:,None]
 def quack(L):
   n=int(L*SR); t=np.arange(n)/SR; u=t/L
@@ -64,5 +65,23 @@ for e in cfg['sfx']:
     t=T(0.09); add(np.sin(2*np.pi*(900-500*t/0.09)*t)*np.exp(-t*40)*0.2,t0)
   elif kind=='boing':   # spring boing
     t=T(0.5); add(np.sin(2*np.pi*np.cumsum(220+120*np.sin(2*np.pi*14*t)*np.exp(-t*5))/SR)*np.exp(-t*5)*0.16,t0)
+  elif kind=='heartbeat':  # lub-dub
+    for off,amp in ((0,1),(0.16,0.7)):
+      t=T(0.22); add(np.sin(2*np.pi*(48+25*np.exp(-t*30))*t)*np.exp(-t*14)*0.5*amp,t0+off)
+  elif kind=='drone':   # horror rumble with tremolo
+    d=e[2]; t=T(d); s_=sum(np.sin(2*np.pi*f*t)*a for f,a in ((41,1),(43.5,.8),(82,.3)))*(0.7+0.3*np.sin(2*np.pi*5*t))
+    s_+=sosfilt(bp(80,400),rng.standard_normal(len(t)))*0.5
+    add(s_*np.minimum(1,t/0.3)*np.minimum(1,(d-t)/0.15)*0.10,t0)
+  elif kind=='sting':   # dissonant string stab / scare
+    amp=e[2] if len(e)>2 else 1.0; t=T(1.4)
+    s_=sum(np.sign(np.sin(2*np.pi*f*t+np.sin(2*np.pi*6*t)*0.4))*0.25 for f in (466,494,523,740,784,1109))
+    s_=sosfilt(bp(400,6000),s_)+sosfilt(bp(2000,9000),rng.standard_normal(len(t)))*0.4
+    add(s_*np.exp(-t*2.2)*np.minimum(1,t/0.006)*0.07*amp,t0)
+  elif kind=='hit':     # CoD-style hitmarker tick
+    t=T(0.06); c=np.sin(2*np.pi*3400*t)*0.6+np.sin(2*np.pi*5200*t)*0.3+sosfilt(butter(2,4000,'high',fs=SR,output='sos'),rng.standard_normal(len(t)))*0.5
+    add(c*np.exp(-t*90)*0.22,t0)
+  elif kind=='kill':    # heavier marker + ding
+    t=T(0.06); c=np.sin(2*np.pi*3000*t)*0.6+sosfilt(butter(2,3000,'high',fs=SR,output='sos'),rng.standard_normal(len(t)))*0.5
+    add(c*np.exp(-t*60)*0.26,t0); add(tone([(2637,1),(5274,.3)],0.4,9,0.10),t0+0.01); t=T(0.2); add(np.sin(2*np.pi*(90+60*np.exp(-t*30))*t)*np.exp(-t*18)*0.3,t0)
 y[-int(.004*SR):]*=np.linspace(1,0,int(.004*SR))[:,None]
 sf.write(f'v{v}/work/mix_premaster.wav',y.astype(np.float32),SR); print(v,'peak',round(float(np.abs(y).max()),3))

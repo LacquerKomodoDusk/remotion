@@ -32,7 +32,7 @@ export type Cfg = {
 	shake?: [number, number, number][];
 	// optional per-video tools: hold a source frame on the game view, grade the game, white flashes
 	freezes?: [number, number, number][];
-	grades?: [number, number, string][];
+	grades?: [number, number, string, string?][];
 	flashes?: [number, number][];
 	punch: {t: number};
 	[k: string]: unknown;
@@ -183,6 +183,7 @@ export const Edit: React.FC<{cfg: Cfg; video: string}> = ({cfg, video}) => {
 	const subY = lerp(SUB_Y[L.from], SUB_Y[L.to], L.p);
 	const fr = (cfg.freezes ?? []).find(([a, b]) => t >= a && t < b);
 	const grade = (cfg.grades ?? []).filter(([a, b]) => t >= a && t < b).map((g) => g[2]).join(' ');
+	const camGrade = (cfg.grades ?? []).filter(([a, b, , w]) => w === 'all' && t >= a && t < b).map((g) => g[2]).join(' ');
 	let flash = 0;
 	for (const [ft, m] of cfg.flashes ?? []) {
 		const ff = (t - ft) * fps;
@@ -201,7 +202,7 @@ export const Edit: React.FC<{cfg: Cfg; video: string}> = ({cfg, video}) => {
 			) : (
 				<View src={src} dst={game.dst} srcRect={game.src} zoom={gz + gamePunch} focus={gf} shake={shake} blur={whip} grade={grade} />
 			)}
-			<View src={src} dst={cam.dst} srcRect={cam.src} zoom={camZoom} focus={[0.5, 0.32]} shake={[shake[0] * 0.5, shake[1] * 0.5]} blur={L.to === 'game_full' ? whip : 0} />
+			<View src={src} dst={cam.dst} srcRect={cam.src} zoom={camZoom} focus={[0.5, 0.32]} shake={[shake[0] * 0.5, shake[1] * 0.5]} blur={L.to === 'game_full' ? whip : 0} grade={camGrade} />
 			{L.to === 'game_full' && L.p > 0.95 ? null : (
 				<div style={{position: 'absolute', left: 0, width: 1080, top: cam.dst[1] + cam.dst[3] - 2, height: 26, background: 'linear-gradient(rgba(11,21,48,0.45), rgba(11,21,48,0))'}} />
 			)}

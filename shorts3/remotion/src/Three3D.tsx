@@ -281,7 +281,7 @@ export const Flowers: React.FC<{lf: number; n: number}> = ({lf, n}) => {
 };
 
 // ---------- v12: the house with its residents ----------
-export const House: React.FC<{t: number; fps: number; out: number[]; extra: number; at: [number, number]; scale: number; inAt: number}> = ({t, fps, out, extra, at, scale, inAt}) => {
+export const House: React.FC<{t: number; fps: number; out: number[]; extra: number; at: [number, number]; scale: number; inAt: number; scary?: number}> = ({t, fps, out, extra, at, scale, inAt, scary = 0}) => {
 	const g = useMemo(() => ({
 		body: new THREE.BoxGeometry(1.0, 0.72, 0.8),
 		roof: (() => {
@@ -320,15 +320,15 @@ export const House: React.FC<{t: number; fps: number; out: number[]; extra: numb
 	};
 	return (
 		<group position={[x + shake, y, 0]} scale={inP * scale} rotation={[0.25, -0.5 + Math.sin(t * 0.8) * 0.12, 0]}>
-			<O geo={g.body} color="#F2EEE3" />
+			<O geo={g.body} color={scary > 0.5 ? '#3A3F4A' : '#F2EEE3'} />
 			<O geo={g.roof} color="#E8322B" pos={[0, 0.36, 0]} line={1.06} />
 			<O geo={g.chim} color="#B9C0CC" pos={[0.28, 0.82, 0.12]} />
-			<O geo={g.door} color="#7A4A22" pos={[0, -0.19, 0.41]} />
-			<O geo={g.win} color="#FFD23F" emissive="#806000" pos={[-0.3, 0.1, 0.41]} />
-			<O geo={g.win} color="#FFD23F" emissive="#806000" pos={[0.3, 0.1, 0.41]} />
-			{fig(0, [-0.3, -0.24, 0.62], out[0], '#FF3B3B')}
-			{fig(1, [0.0, -0.24, 0.72], out[1], '#FF3B3B')}
-			{fig(2, [0.3, -0.24, 0.62], out[2], '#FF3B3B')}
+			<O geo={g.door} color={scary > 0.5 ? '#000000' : '#7A4A22'} pos={[0, -0.19, 0.41]} />
+			<O geo={g.win} color={scary > 0.5 ? '#FF0000' : '#FFD23F'} emissive={scary > 0.5 ? '#FF2020' : '#806000'} pos={[-0.3, 0.1, 0.41]} />
+			<O geo={g.win} color={scary > 0.5 ? '#FF0000' : '#FFD23F'} emissive={scary > 0.5 ? '#FF2020' : '#806000'} pos={[0.3, 0.1, 0.41]} />
+			{scary > 0.5 ? null : fig(0, [-0.3, -0.24, 0.62], out[0], '#FF3B3B')}
+			{scary > 0.5 ? null : fig(1, [0.0, -0.24, 0.72], out[1], '#FF3B3B')}
+			{scary > 0.5 ? null : fig(2, [0.3, -0.24, 0.62], out[2], '#FF3B3B')}
 			{fig(3, [0.28, 1.12, 0.12], extra, '#B69CFF')}
 		</group>
 	);
