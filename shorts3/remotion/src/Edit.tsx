@@ -1,5 +1,5 @@
 import React from 'react';
-import {AbsoluteFill, Easing, Img, OffthreadVideo, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig} from 'remotion';
+import {AbsoluteFill, Easing, Freeze, Img, OffthreadVideo, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig} from 'remotion';
 import {loadFont} from '@remotion/fonts';
 import {Concept} from './Concepts';
 
@@ -30,6 +30,10 @@ export type Cfg = {
 	gameKeys: [number, number, number, number][];
 	punches: [number, 'cam' | 'game', number][];
 	shake?: [number, number, number][];
+	// optional per-video tools: hold a source frame on the game view, grade the game, white flashes
+	freezes?: [number, number, number][];
+	grades?: [number, number, string][];
+	flashes?: [number, number][];
 	punch: {t: number};
 	[k: string]: unknown;
 };
@@ -64,7 +68,7 @@ export const useLayout = (cfg: Cfg, t: number, fps: number) => {
 	return {from, to, p, speed, start};
 };
 
-const View: React.FC<{src: string; dst: Rect; srcRect: Rect; zoom: number; focus: [number, number]; shake: [number, number]; blur: number}> = ({src, dst, srcRect, zoom, focus, shake, blur}) => {
+const View: React.FC<{src: string; dst: Rect; srcRect: Rect; zoom: number; focus: [number, number]; shake: [number, number]; blur: number; grade?: string}> = ({src, dst, srcRect, zoom, focus, shake, blur, grade = ''}) => {
 	const [sx, sy, sw, sh] = srcRect;
 	const fx = sx + sw * focus[0];
 	const fy = sy + sh * focus[1];
@@ -88,7 +92,7 @@ const View: React.FC<{src: string; dst: Rect; srcRect: Rect; zoom: number; focus
 					width: SRC_W * s,
 					height: SRC_H * s,
 					maxWidth: 'none',
-					filter: `contrast(1.06) saturate(1.08) brightness(1.02)${blur > 0.3 ? ` blur(${blur}px)` : ''}`,
+					filter: `contrast(1.06) saturate(1.08) brightness(1.02)${grade ? ` ${grade}` : ''}${blur > 0.3 ? ` blur(${blur}px)` : ''}`,
 				}}
 			/>
 		</div>
@@ -177,13 +181,26 @@ export const Edit: React.FC<{cfg: Cfg; video: string}> = ({cfg, video}) => {
 		if (t >= w.s && t < until) cur = w;
 	}
 	const subY = lerp(SUB_Y[L.from], SUB_Y[L.to], L.p);
+	const fr = (cfg.freezes ?? []).find(([a, b]) => t >= a && t < b);
+	const grade = (cfg.grades ?? []).filter(([a, b]) => t >= a && t < b).map((g) => g[2]).join(' ');
+	let flash = 0;
+	for (const [ft, m] of cfg.flashes ?? []) {
+		const ff = (t - ft) * fps;
+		if (ff >= 0 && ff < 12) flash = Math.max(flash, m * interpolate(ff, [0, 12], [1, 0], {easing: Easing.out(Easing.quad)}));
+	}
 
 	return (
 		<AbsoluteFill style={{backgroundColor: NAVY}}>
 			<div style={{position: 'absolute', inset: 0, overflow: 'hidden'}}>
 				<OffthreadVideo src={src} muted style={{position: 'absolute', left: -540, top: -200, width: 2160, height: 3840, maxWidth: 'none', filter: 'blur(28px) brightness(0.5) saturate(1.2)'}} />
 			</div>
-			<View src={src} dst={game.dst} srcRect={game.src} zoom={gz + gamePunch} focus={gf} shake={shake} blur={whip} />
+			{fr ? (
+				<Freeze frame={Math.round(fr[2] * fps)}>
+					<View src={src} dst={game.dst} srcRect={game.src} zoom={gz + gamePunch} focus={gf} shake={shake} blur={whip} grade={grade} />
+				</Freeze>
+			) : (
+				<View src={src} dst={game.dst} srcRect={game.src} zoom={gz + gamePunch} focus={gf} shake={shake} blur={whip} grade={grade} />
+			)}
 			<View src={src} dst={cam.dst} srcRect={cam.src} zoom={camZoom} focus={[0.5, 0.32]} shake={[shake[0] * 0.5, shake[1] * 0.5]} blur={L.to === 'game_full' ? whip : 0} />
 			{L.to === 'game_full' && L.p > 0.95 ? null : (
 				<div style={{position: 'absolute', left: 0, width: 1080, top: cam.dst[1] + cam.dst[3] - 2, height: 26, background: 'linear-gradient(rgba(11,21,48,0.45), rgba(11,21,48,0))'}} />
@@ -194,6 +211,7 @@ export const Edit: React.FC<{cfg: Cfg; video: string}> = ({cfg, video}) => {
 					<WordView w={cur} t={t} fps={fps} />
 				</div>
 			) : null}
+			{flash > 0.01 ? <AbsoluteFill style={{background: '#FFFFFF', opacity: flash}} /> : null}
 			<AbsoluteFill style={{background: 'radial-gradient(ellipse at 50% 48%, rgba(0,0,0,0) 55%, rgba(5,8,25,0.36) 100%)'}} />
 			<Img src={staticFile(`grain/${Math.floor(frame / 2) % 8}.png`)} style={{position: 'absolute', inset: 0, width: 1080, height: 1920, mixBlendMode: 'overlay'}} />
 		</AbsoluteFill>

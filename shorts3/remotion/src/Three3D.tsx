@@ -176,3 +176,160 @@ export const Cup: React.FC<{lf: number; fps: number; at: [number, number]}> = ({
 		</group>
 	);
 };
+
+// ---------- v9: wood splinters per shot + the crowned boss tree ----------
+export const Splinters: React.FC<{t: number; fps: number; hits: number[]; at: [number, number]}> = ({t, fps, hits, at}) => {
+	const geo = useMemo(() => new THREE.BoxGeometry(0.09, 0.28, 0.06), []);
+	const [x, y] = px2w(at[0], at[1]);
+	return (
+		<>
+			{hits.map((h, k) => {
+				const lf = (t - h) * fps;
+				if (lf < 0 || lf > 26) return null;
+				return Array.from({length: 9}).map((_, i) => {
+					const a = i * 2.39 + k * 1.3;
+					const sp = 0.045 + ((i * 37) % 10) * 0.004;
+					const px = x + Math.cos(a) * sp * lf;
+					const py = y + Math.sin(a) * sp * lf * 0.8 + 0.03 * lf - 0.0016 * lf * lf * 1.6;
+					const o = Math.max(0, 1 - lf / 26);
+					return <O key={`${k}-${i}`} geo={geo} color={i % 3 ? '#C8873E' : '#F2D19A'} pos={[px, py, 0.4]} rot={[lf * 0.4 + i, lf * 0.3, a]} scale={o} line={1.15} flat />;
+				});
+			})}
+		</>
+	);
+};
+
+export const CrownTree: React.FC<{lf: number; fps: number; at: [number, number]}> = ({lf, fps, at}) => {
+	const g = useMemo(() => ({
+		trunk: new THREE.CylinderGeometry(0.1, 0.16, 0.8, 8),
+		c1: new THREE.IcosahedronGeometry(0.42, 0),
+		c2: new THREE.IcosahedronGeometry(0.34, 0),
+		c3: new THREE.IcosahedronGeometry(0.3, 0),
+		band: new THREE.CylinderGeometry(0.26, 0.24, 0.12, 24, 1, true),
+		spike: new THREE.ConeGeometry(0.06, 0.18, 4),
+		gem: new THREE.OctahedronGeometry(0.05, 0),
+	}), []);
+	const inP = spring({frame: lf, fps, config: {damping: 10, stiffness: 160}});
+	const crownP = spring({frame: lf - 14, fps, config: {damping: 8, stiffness: 200}});
+	const [x, y] = px2w(at[0], at[1]);
+	const gold = {color: '#FFC83D', metal: 0.2, rough: 0.3, emissive: '#5A3A00'};
+	return (
+		<group position={[x, y, 0]} scale={inP * 0.8} rotation={[0.12, lf * 0.035, 0]}>
+			<O geo={g.trunk} color="#7A4A22" pos={[0, -0.25, 0]} flat />
+			<O geo={g.c1} color="#3DBA4E" pos={[0, 0.35, 0]} flat />
+			<O geo={g.c2} color="#4FD15E" pos={[-0.28, 0.12, 0.1]} flat />
+			<O geo={g.c3} color="#34A845" pos={[0.27, 0.15, -0.05]} flat />
+			<group position={[0, 0.82 + (1 - crownP) * 1.4, 0]} rotation={[0.2, 0, 0.12]}>
+				<O geo={g.band} {...gold} side={THREE.DoubleSide} />
+				{Array.from({length: 6}).map((_, i) => {
+					const a = (i / 6) * Math.PI * 2;
+					return <O key={i} geo={g.spike} {...gold} pos={[Math.cos(a) * 0.23, 0.13, Math.sin(a) * 0.23]} />;
+				})}
+				<O geo={g.gem} color="#FF3B3B" pos={[0, 0, 0.26]} emissive="#400000" />
+			</group>
+		</group>
+	);
+};
+
+// ---------- v11: velvet curtains + thrown flowers ----------
+export const Curtains: React.FC<{open: number}> = ({open}) => {
+	const geo = useMemo(() => {
+		const g = new THREE.PlaneGeometry(1.75, 5.8, 40, 1);
+		const p = g.attributes.position;
+		for (let i = 0; i < p.count; i++) p.setZ(i, Math.sin(p.getX(i) * 22) * 0.06);
+		g.computeVertexNormals();
+		return g;
+	}, []);
+	const val = useMemo(() => new THREE.BoxGeometry(3.4, 0.42, 0.2), []);
+	const trim = useMemo(() => new THREE.BoxGeometry(3.4, 0.06, 0.22), []);
+	// open 0 = closed (meeting in the middle), 1 = fully out of frame
+	const off = open * 1.65;
+	const velvet = {color: '#9E1027', rough: 0.75, metal: 0.05, emissive: '#2A0008'};
+	return (
+		<>
+			<group position={[-0.86 - off, 0, 1]} rotation={[0, 0.05, 0]}><O geo={geo} {...velvet} line={1} side={THREE.DoubleSide} /></group>
+			<group position={[0.86 + off, 0, 1]} rotation={[0, -0.05, 0]}><O geo={geo} {...velvet} line={1} side={THREE.DoubleSide} /></group>
+			<group position={[0, 2.55 + open * 0.5, 1.2]}>
+				<O geo={val} {...velvet} line={1} />
+				<O geo={trim} color="#FFC83D" metal={0.3} emissive="#5A3A00" pos={[0, -0.22, 0]} line={1} />
+			</group>
+		</>
+	);
+};
+
+export const Flowers: React.FC<{lf: number; n: number}> = ({lf, n}) => {
+	const g = useMemo(() => ({head: new THREE.IcosahedronGeometry(0.07, 0), stem: new THREE.CylinderGeometry(0.012, 0.012, 0.28, 6)}), []);
+	if (lf < 0) return null;
+	return (
+		<>
+			{Array.from({length: n}).map((_, i) => {
+				const d = (i % 7) * 3;
+				const l = lf - d;
+				if (l < 0) return null;
+				const x = -1.3 + ((i * 53) % 100) / 100 * 2.6;
+				const y = 2.9 - l * (0.045 + (i % 4) * 0.008);
+				if (y < -2.8) return null;
+				return (
+					<group key={i} position={[x + Math.sin(l / 9 + i) * 0.15, y, 0.5]} rotation={[l * 0.08 + i, l * 0.05, l * 0.11 + i]}>
+						<O geo={g.head} color={i % 3 === 0 ? '#FFD23F' : '#FF3B5C'} pos={[0, 0.16, 0]} flat />
+						<O geo={g.stem} color="#3DBA4E" line={1.3} />
+					</group>
+				);
+			})}
+		</>
+	);
+};
+
+// ---------- v12: the house with its residents ----------
+export const House: React.FC<{t: number; fps: number; out: number[]; extra: number; at: [number, number]; scale: number; inAt: number}> = ({t, fps, out, extra, at, scale, inAt}) => {
+	const g = useMemo(() => ({
+		body: new THREE.BoxGeometry(1.0, 0.72, 0.8),
+		roof: (() => {
+			const sh = new THREE.Shape();
+			sh.moveTo(-0.62, 0);
+			sh.lineTo(0.62, 0);
+			sh.lineTo(0, 0.5);
+			sh.closePath();
+			const g = new THREE.ExtrudeGeometry(sh, {depth: 0.9, bevelEnabled: false});
+			g.translate(0, 0, -0.45);
+			return g;
+		})(),
+		door: new THREE.BoxGeometry(0.2, 0.34, 0.04),
+		win: new THREE.BoxGeometry(0.2, 0.18, 0.04),
+		chim: new THREE.BoxGeometry(0.16, 0.36, 0.16),
+		body2: new THREE.CapsuleGeometry(0.08, 0.14, 6, 12),
+		head: new THREE.SphereGeometry(0.08, 16, 12),
+	}), []);
+	const lf = (t - inAt) * fps;
+	const inP = spring({frame: lf, fps, config: {damping: 10, stiffness: 170}});
+	const [x, y] = px2w(at[0], at[1]);
+	const lastPop = [...out, extra].filter((o) => t >= o).sort((a, b) => b - a)[0] ?? -9;
+	const shake = Math.sin((t - lastPop) * 70) * 0.06 * Math.max(0, 1 - (t - lastPop) * 4);
+	const fig = (k: number, home: [number, number, number], leave: number, color: string) => {
+		const l = (t - leave) * fps;
+		if (l > 40) return null;
+		const fly = l > 0 ? l : 0;
+		const appear = k === 3 ? spring({frame: (t - leave + 0.35) * fps, fps, config: {damping: 9, stiffness: 220}}) : 1;
+		if (k === 3 && t < leave - 0.35) return null;
+		return (
+			<group key={k} position={[home[0] + fly * 0.035 * (k % 2 ? 1 : -1), home[1] + fly * 0.06 - fly * fly * 0.0012 + (k === 3 ? (appear - 1) * 0.3 : 0), home[2] + fly * 0.02]} rotation={[0, 0, fly * 0.25]} scale={Math.max(0, 1 - fly / 40) * appear}>
+				<O geo={g.body2} color={color} />
+				<O geo={g.head} color={color} pos={[0, 0.2, 0]} />
+			</group>
+		);
+	};
+	return (
+		<group position={[x + shake, y, 0]} scale={inP * scale} rotation={[0.25, -0.5 + Math.sin(t * 0.8) * 0.12, 0]}>
+			<O geo={g.body} color="#F2EEE3" />
+			<O geo={g.roof} color="#E8322B" pos={[0, 0.36, 0]} line={1.06} />
+			<O geo={g.chim} color="#B9C0CC" pos={[0.28, 0.82, 0.12]} />
+			<O geo={g.door} color="#7A4A22" pos={[0, -0.19, 0.41]} />
+			<O geo={g.win} color="#FFD23F" emissive="#806000" pos={[-0.3, 0.1, 0.41]} />
+			<O geo={g.win} color="#FFD23F" emissive="#806000" pos={[0.3, 0.1, 0.41]} />
+			{fig(0, [-0.3, -0.24, 0.62], out[0], '#FF3B3B')}
+			{fig(1, [0.0, -0.24, 0.72], out[1], '#FF3B3B')}
+			{fig(2, [0.3, -0.24, 0.62], out[2], '#FF3B3B')}
+			{fig(3, [0.28, 1.12, 0.12], extra, '#B69CFF')}
+		</group>
+	);
+};

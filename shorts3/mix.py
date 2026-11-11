@@ -43,5 +43,26 @@ for e in cfg['sfx']:
     for i in range(3): t=T(0.11); add(0.09*np.sign(np.sin(2*np.pi*1400*t))*np.minimum(1,t/0.005)*np.minimum(1,(0.11-t)/0.005),t0+i*0.17)
   elif kind=='buzz':    # "wrong" buzzer
     t=T(0.42); add(sosfilt(butter(2,1800,'low',fs=SR,output='sos'),0.12*np.sign(np.sin(2*np.pi*140*t)))*np.minimum(1,(0.42-t)/0.03),t0)
+  elif kind=='tick':    # clock tick for countdowns
+    t=T(0.05); add(sosfilt(bp(2500,6000),rng.standard_normal(len(t)))*np.exp(-t*120)*0.22,t0)
+  elif kind=='boss':    # boss intro: low brass hit + sub drone
+    t=T(1.6); s_=sum(np.sin(2*np.pi*f*t+np.sin(2*np.pi*3*t)*0.3)*a for f,a in ((55,1),(110,.6),(165,.35),(220,.2)))
+    add(s_*np.exp(-t*1.6)*np.minimum(1,t/0.02)*0.22,t0)
+  elif kind=='thud':    # bullet into wood
+    t=T(0.12); add((sosfilt(bp(300,1500),rng.standard_normal(len(t)))*0.6+np.sin(2*np.pi*180*t))*np.exp(-t*45)*0.16,t0)
+  elif kind=='rewind':  # tape rewind chirp
+    t=T(0.45); f=2400-1800*t/0.45; add(np.sin(2*np.pi*np.cumsum(f)/SR)*np.sin(np.pi*t/0.45)*0.06+sosfilt(bp(1500,6000),rng.standard_normal(len(t)))*0.03,t0)
+  elif kind=='applause':  # crowd claps: many short noise bursts
+    d=e[2] if len(e)>2 else 1.2; n=int(d*SR); s_=np.zeros(n)
+    for c in rng.uniform(0,d,int(d*90)):
+      a=int(c*SR); L=int(0.025*SR); seg=sosfilt(bp(900,5000),rng.standard_normal(L))*np.exp(-np.arange(L)/SR*160)
+      s_[a:a+L]+=seg[:max(0,min(L,n-a))]*rng.uniform(.3,1)
+    env=np.minimum(1,np.arange(n)/SR/0.15)*np.minimum(1,(n-np.arange(n))/SR/0.5); add(s_*env*0.05,t0)
+  elif kind=='curtain': # heavy fabric swoosh
+    t=T(1.0); add(sosfilt(bp(150,1800),rng.standard_normal(len(t)))*np.sin(np.pi*t/1.0)**1.5*0.12,t0)
+  elif kind=='pop':     # cartoon pop
+    t=T(0.09); add(np.sin(2*np.pi*(900-500*t/0.09)*t)*np.exp(-t*40)*0.2,t0)
+  elif kind=='boing':   # spring boing
+    t=T(0.5); add(np.sin(2*np.pi*np.cumsum(220+120*np.sin(2*np.pi*14*t)*np.exp(-t*5))/SR)*np.exp(-t*5)*0.16,t0)
 y[-int(.004*SR):]*=np.linspace(1,0,int(.004*SR))[:,None]
 sf.write(f'v{v}/work/mix_premaster.wav',y.astype(np.float32),SR); print(v,'peak',round(float(np.abs(y).max()),3))

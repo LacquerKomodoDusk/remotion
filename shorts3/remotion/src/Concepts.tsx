@@ -1,8 +1,8 @@
 import React from 'react';
-import {Easing, interpolate, spring} from 'remotion';
+import {Easing, OffthreadVideo, Sequence, interpolate, spring} from 'remotion';
 import type {Cfg} from './Edit';
 import {FONT, NAVY} from './theme';
-import {Stage, TreeGavel, Shells, Chandelier, Cup} from './Three3D';
+import {Stage, Shells, Splinters, CrownTree, Curtains, Flowers, House} from './Three3D';
 
 // Per-video "seasoning": one concept each + the ONE editorial caption (punchline).
 // Concept colours never reuse the subtitle emotion colours as text colour on purpose.
@@ -283,6 +283,8 @@ const Tip: React.FC<P> = ({cfg, t, fps}) => {
 };
 
 // ---------------- v9–v12: 3D props + outlined caption (no plates) ----------------
+const lerpN = (a: number, b: number, q: number) => a + (b - a) * q;
+const strokeS = {WebkitTextStroke: `9px ${NAVY}`, paintOrder: 'stroke fill', textShadow: `0 5px 0 ${NAVY}`} as React.CSSProperties;
 const stroke = {WebkitTextStroke: `8px ${NAVY}`, paintOrder: 'stroke fill', textShadow: `0 5px 0 ${NAVY}`} as React.CSSProperties;
 // caption block centred on the non-safe-zone width (0–918), lines pop in one after another
 const Cap: React.FC<{lf: number; fps: number; top: number; lines: [string, number, string][]; step?: number}> = ({lf, fps, top, lines, step = 6}) => (
@@ -296,24 +298,91 @@ const Cap: React.FC<{lf: number; fps: number; top: number; lines: [string, numbe
 	</div>
 );
 
-const Protocol: React.FC<P> = ({cfg, t, fps}) => {
-	const lf = (t - cfg.punch.t) * fps;
-	if (lf < 0) return null;
-	const hit = 50;
-	const st = lf - hit;
-	return (
-		<>
-			<Stage><TreeGavel lf={lf} fps={fps} hit={hit} at={[459, 1000]} /></Stage>
-			<Cap lf={lf - 8} fps={fps} top={1230} lines={[['виновник:', 36, '#FFFFFF'], ['ДЕРЕВО', 76, '#7CFF6B'], ['со слов пострадавшего', 30, '#E6E9F2']]} />
-			{st >= 0 ? (
-				<div style={{position: 'absolute', left: 0, width: 918, top: 1120, display: 'flex', justifyContent: 'center'}}>
-					<div style={{transform: `rotate(-9deg) scale(${interpolate(st, [0, 4, 10], [2, 0.9, 1], {extrapolateRight: 'clamp'})})`, opacity: Math.min(1, st / 2), border: `8px solid ${RED}`, borderRadius: 14, padding: '6px 20px', background: 'rgba(255,255,255,0.92)', boxShadow: `0 8px 0 ${NAVY}`}}>
-						<span style={txt(58, RED, {letterSpacing: '0.06em'})}>ОПРАВДАНО</span>
+// v9 — boss fight: countdown to the "boss", boss HP bar chipped by his own shots, slow replay, crowned winner
+const Boss: React.FC<P> = ({cfg, t, fps, layout, video}) => {
+	const B = cfg.boss as {t: number; hits: number[]; death: number; at: [number, number]; replay: [number, number, number, number]};
+	const els: React.ReactNode[] = [];
+	const gameFull = layout.to === 'game_full' && layout.p > 0.6;
+	// 1) countdown chip: open loop from the first frame
+	if (t < B.t + 0.5) {
+		const left = Math.max(0, B.t - t);
+		const hot = left < 3;
+		const pulse = hot ? 1 + 0.08 * Math.max(0, Math.cos((left % 1) * Math.PI * 2)) : 1;
+		const o = interpolate(t, [B.t, B.t + 0.5], [1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+		const sec = Math.floor(left);
+		const cs = Math.floor((left - sec) * 10);
+		els.push(
+			<div key="cd" style={{position: 'absolute', left: 60, top: 205, opacity: o, transform: `scale(${pulse})`, transformOrigin: '0 50%', display: 'flex', alignItems: 'center', gap: 16, background: hot ? RED : 'rgba(11,21,48,0.82)', border: `5px solid ${NAVY}`, borderRadius: 18, padding: '10px 20px', boxShadow: `0 8px 0 ${NAVY}`}}>
+				<span style={txt(26, hot ? '#FFFFFF' : '#FFD23F', {letterSpacing: '0.12em'})}>ДО БОССА</span>
+				<span style={{...txt(54, '#FFFFFF'), display: 'flex'}}>
+					{`0${sec}`.slice(-2).split('').concat([',', String(cs)]).map((c, i) => <span key={i} style={{width: c === ',' ? 18 : 40, textAlign: 'center'}}>{c}</span>)}
+				</span>
+			</div>,
+		);
+	}
+	// 2) boss bar from the intro until the cut to the webcam
+	if (t >= B.t && t < 11.2) {
+		const lf = (t - B.t) * fps;
+		const hp = 100 - B.hits.filter((h) => t >= h).length;
+		const lastHit = [...B.hits].reverse().find((h) => t >= h) ?? -9;
+		const hf = (t - lastHit) * fps;
+		const slide = interpolate(spring({frame: lf, fps, config: {damping: 14, stiffness: 150}}), [0, 1], [60, 0]);
+		els.push(
+			<div key="bar" style={{position: 'absolute', left: 70, top: 1300 + slide, width: 780, opacity: Math.min(1, lf / 6)}}>
+				<div style={{display: 'flex', alignItems: 'baseline', justifyContent: 'space-between'}}>
+					<div>
+						<div style={txt(26, '#FFD23F', {...strokeS, letterSpacing: '0.16em'})}>БОСС ЛОКАЦИИ</div>
+						<div style={txt(64, '#FFFFFF', strokeS)}>ДЕРЕВО</div>
 					</div>
+					<div style={txt(44, '#FFFFFF', {...strokeS, transform: `scale(${hf < 8 ? 1.25 - hf * 0.03 : 1})`})}>{hp}%</div>
 				</div>
-			) : null}
-		</>
-	);
+				<div style={{marginTop: 10, height: 30, borderRadius: 8, border: `5px solid ${NAVY}`, background: '#2A0D12', overflow: 'hidden', position: 'relative', boxShadow: `0 6px 0 ${NAVY}`}}>
+					<div style={{position: 'absolute', left: 0, top: 0, bottom: 0, width: `${hp}%`, background: 'linear-gradient(#FF5A4E, #B3121B)'}} />
+					{hf < 10 ? <div style={{position: 'absolute', left: `${hp}%`, top: 0, bottom: 0, width: '1.2%', background: '#FFFFFF', opacity: 1 - hf / 10}} /> : null}
+				</div>
+			</div>,
+		);
+	}
+	// 3) splinters fly off the tree on every one of his shots (game_full only)
+	if (gameFull && t >= B.hits[0] && t < B.death + 0.6) els.push(<Stage key="spl"><Splinters t={t} fps={fps} hits={B.hits} at={B.at} /></Stage>);
+	// 4) slow replay with telestrator over the dead lobby time
+	const [r0, rSrc, rate, rDur] = B.replay;
+	if (t >= r0 - 0.2 && t < r0 + rDur + 0.2) {
+		const lf = (t - r0) * fps;
+		const sIn = interpolate(lf, [-12, 0], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.out(Easing.back(1.6))});
+		const sOut = interpolate(t, [r0 + rDur, r0 + rDur + 0.2], [1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+		const srcT = rSrc + Math.max(0, t - r0) * rate;
+		const W = 800, H = 640, SX = 0, SY = 604, SW = 918, SH = 734, k = W / SW;
+		const tree: [number, number] = [(540 - SX) * k, (900 - SY) * k];
+		const enemy: [number, number] = [(200 - SX) * k, (1140 - SY) * k];
+		const circ = (c: [number, number], r: number, col: string, from: number) => {
+			const q = interpolate(srcT, [from, from + 0.12], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+			return q > 0 ? <circle cx={c[0]} cy={c[1]} r={r} fill="none" stroke={col} strokeWidth={9} strokeLinecap="round" strokeDasharray={`${q * 2 * Math.PI * r} 9999`} transform={`rotate(-90 ${c[0]} ${c[1]})`} /> : null;
+		};
+		els.push(
+			<div key="rp" style={{position: 'absolute', left: 60, top: 820, width: W, height: H, transform: `scale(${sIn * sOut})`, borderRadius: 26, overflow: 'hidden', border: `7px solid ${NAVY}`, boxShadow: `0 14px 0 ${NAVY}`}}>
+				<Sequence from={Math.round(r0 * fps)} layout="none">
+					<OffthreadVideo src={video} muted startFrom={Math.round(rSrc * fps)} playbackRate={rate} style={{position: 'absolute', left: -SX * k, top: -SY * k, width: 918 * k, height: 1632 * k, maxWidth: 'none', filter: 'saturate(0.85) contrast(1.1)'}} />
+				</Sequence>
+				<svg width={W} height={H} style={{position: 'absolute', left: 0, top: 0}}>
+					{B.hits.map((h, i) => (srcT >= h && srcT < h + 0.25 ? <line key={i} x1={150} y1={H} x2={tree[0] + (i % 3) * 14 - 14} y2={tree[1] + (i % 2) * 20} stroke="#FFD23F" strokeWidth={6} strokeDasharray="18 14" /> : null))}
+					{circ(tree, 70, '#FFD23F', B.hits[0])}
+					{circ(enemy, 64, '#FF3B3B', B.death - 0.15)}
+				</svg>
+				<div style={{position: 'absolute', left: 18, top: 16, display: 'flex', alignItems: 'center', gap: 10, background: 'rgba(11,21,48,0.85)', borderRadius: 12, padding: '6px 14px'}}>
+					<div style={{width: 18, height: 18, borderRadius: 9, background: RED, opacity: Math.floor(t * 3) % 2 ? 1 : 0.3}} />
+					<span style={txt(28, '#FFFFFF')}>ПОВТОР ×{rate}</span>
+				</div>
+			</div>,
+		);
+	}
+	// 5) punchline: the crowned boss + its HP
+	const lf = (t - cfg.punch.t) * fps;
+	if (lf >= 0) {
+		els.push(<Stage key="ct"><CrownTree lf={lf} fps={fps} at={[459, 1050]} /></Stage>);
+		els.push(<Cap key="cap" lf={lf - 16} fps={fps} top={1250} lines={[['ДЕРЕВО — HP 95%', 58, '#7CFF6B'], ['босс не побеждён', 40, '#FFFFFF']]} step={8} />);
+	}
+	return <>{els}</>;
 };
 
 const Ammo: React.FC<P> = ({cfg, t, fps}) => {
@@ -340,30 +409,92 @@ const Ammo: React.FC<P> = ({cfg, t, fps}) => {
 	);
 };
 
-const Ticket: React.FC<P> = ({cfg, t, fps}) => {
+// v11 — a play in three acts: curtains open, spotlight + act badge per knock, finale with flowers, curtains close (loop)
+const ROMAN = ['I', 'II', 'III', 'IV'];
+const Theatre: React.FC<P> = ({cfg, t, fps, layout}) => {
+	const T = cfg.theatre as {acts: number[]; finale: number; close: number; spot: [number, number]};
+	const els: React.ReactNode[] = [];
+	const open = Math.min(interpolate(t, [0.05, 1.0], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.inOut(Easing.cubic)}), interpolate(t, [T.close, cfg.dur - 0.02], [1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.inOut(Easing.cubic)}));
+	const gameFull = layout.to === 'game_full' && layout.p > 0.6;
+	// spotlight on each knock (dim the house, cone from the top)
+	const act = T.acts.filter((a) => t >= a).length;
+	const lastAct = act ? T.acts[act - 1] : -9;
+	const sl = (t - lastAct) * fps;
+	if (act && sl < 78 && gameFull) {
+		const o = interpolate(sl, [0, 4, 60, 78], [0, 1, 1, 0], {extrapolateRight: 'clamp'});
+		const [sx, sy] = T.spot;
+		els.push(
+			<div key="spot" style={{position: 'absolute', inset: 0, opacity: o}}>
+				<div style={{position: 'absolute', inset: 0, background: `radial-gradient(circle at ${sx}px ${sy}px, rgba(0,0,0,0) 0px, rgba(0,0,0,0) 170px, rgba(5,8,25,0.72) 330px)`}} />
+				<svg width={1080} height={1920} style={{position: 'absolute', left: 0, top: 0, mixBlendMode: 'screen'}}>
+					<defs>
+						<linearGradient id="beam" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#FFF3C4" stopOpacity="0.85" /><stop offset="1" stopColor="#FFD27A" stopOpacity="0.15" /></linearGradient>
+					</defs>
+					<polygon points={`${sx - 40},-40 ${sx + 40},-40 ${sx + 190},${sy + 60} ${sx - 190},${sy + 60}`} fill="url(#beam)" />
+					<ellipse cx={sx} cy={sy + 60} rx={200} ry={46} fill="#FFF3C4" opacity={0.35} />
+				</svg>
+			</div>,
+		);
+	}
+	// act badge: stays on screen, flips to the next act on every knock, "ФИНАЛ" at the triple elimination
+	if (act && t < cfg.punch.t) {
+		const fin = t >= T.finale;
+		const key = fin ? 'F' : String(act);
+		const from = fin ? T.finale : lastAct;
+		const flip = interpolate((t - from) * fps, [0, 8], [90, 0], {extrapolateRight: 'clamp', easing: Easing.out(Easing.back(2))});
+		els.push(
+			<div key={`act${key}`} style={{position: 'absolute', left: 60, top: 205, perspective: 600}}>
+				<div style={{transform: `rotateX(${flip}deg)`, background: 'linear-gradient(#8E1024, #5E0716)', border: `5px solid ${GOLD}`, outline: `5px solid ${NAVY}`, borderRadius: 60, padding: '8px 30px', display: 'flex', alignItems: 'baseline', gap: 14, boxShadow: `0 10px 0 ${NAVY}`}}>
+					{fin ? <span style={txt(46, GOLD)}>ФИНАЛ</span> : <><span style={txt(28, '#F4D9A0', {letterSpacing: '0.14em'})}>АКТ</span><span style={txt(58, GOLD)}>{ROMAN[act - 1]}</span></>}
+				</div>
+			</div>,
+		);
+	}
+	// finale: three sweeping spots + flowers
+	const fl = (t - T.finale) * fps;
+	if (fl >= 0 && fl < 100) {
+		const o = interpolate(fl, [0, 6, 80, 100], [0, 1, 1, 0], {extrapolateRight: 'clamp'});
+		els.push(
+			<svg key="sweep" width={1080} height={1920} style={{position: 'absolute', left: 0, top: 0, mixBlendMode: 'screen', opacity: o}}>
+				{[0, 1, 2].map((i) => {
+					const bx = 540 + Math.sin(fl / 14 + i * 2.1) * 360;
+					return <polygon key={i} points={`${180 + i * 360 - 30},-40 ${180 + i * 360 + 30},-40 ${bx + 150},1500 ${bx - 150},1500`} fill={['#FFF3C4', '#FFC2D1', '#C9F0FF'][i]} opacity={0.32} />;
+				})}
+			</svg>,
+		);
+	}
+	if (fl >= 0 && fl < 260) els.push(<Stage key="fl"><Flowers lf={fl} n={26} /></Stage>);
+	if (open < 0.999) els.push(<Stage key="cur"><Curtains open={open} /></Stage>);
 	const lf = (t - cfg.punch.t) * fps;
-	if (lf < 0) return null;
-	return (
-		<>
-			<Stage><Chandelier lf={lf} fps={fps} at={[459, 1010]} /></Stage>
-			<Cap lf={lf - 10} fps={fps} top={1230} lines={[['БАЛКОН · ряд 1', 40, '#FFFFFF'], ['в программе:', 32, '#E6E9F2'], ['«Тройное устранение»', 58, '#FFC83D']]} />
-		</>
-	);
+	if (lf >= 0 && t < T.close + 0.3) els.push(<Cap key="cap" lf={lf} fps={fps} top={1200} lines={[['СПЕКТАКЛЬ ОКОНЧЕН', 54, '#FFC83D'], ['труппа — в лобби', 44, '#FFFFFF']]} step={9} />);
+	return <>{els}</>;
 };
 
-const Trophy: React.FC<P> = ({cfg, t, fps}) => {
+// v12 — «трое в доме»: a 3D house with three residents leaving one per kill, then a fourth pops out of the chimney
+const HouseCount: React.FC<P> = ({cfg, t, fps}) => {
+	const H = cfg.house as {in: number; out: number[]; extra: number};
 	const lf = (t - cfg.punch.t) * fps;
-	if (lf < 0) return null;
-	return (
-		<>
-			<Stage><Cup lf={lf} fps={fps} at={[459, 1000]} /></Stage>
-			<Cap lf={lf - 8} fps={fps} top={1230} lines={[['ТРОФЕЙ ПОЛУЧЕН', 36, '#E6E9F2'], ['Минус сквад', 72, '#FFFFFF'], ['трое в доме → ноль в доме', 38, '#FFC83D']]} />
-		</>
-	);
+	const mv = interpolate(lf, [0, 16], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.inOut(Easing.cubic)});
+	const at: [number, number] = [lerpN(205, 459, mv), lerpN(360, 1040, mv)];
+	const els: React.ReactNode[] = [<Stage key="h"><House t={t} fps={fps} out={H.out} extra={H.extra} at={at} scale={lerpN(0.62, 1.05, mv)} inAt={H.in} /></Stage>];
+	if (t >= H.in + 0.2 && lf < 0) {
+		const n = 3 - H.out.filter((o) => t >= o).length - (t >= H.extra ? 1 : 0);
+		const last = [...H.out, H.extra].filter((o) => t >= o).sort((a, b) => b - a)[0] ?? H.in;
+		const b = interpolate((t - last) * fps, [0, 4, 12], [1.3, 0.95, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+		const neg = n < 0;
+		els.push(
+			<div key="n" style={{position: 'absolute', left: 50, top: 505, transform: `scale(${b}) rotate(${neg ? Math.sin(t * 40) * 3 : 0}deg)`, transformOrigin: '0 50%', display: 'flex', alignItems: 'baseline', gap: 12}}>
+				<span style={txt(30, '#FFFFFF', strokeS)}>В ДОМЕ:</span>
+				<span style={txt(66, neg ? '#FF3B3B' : n === 0 ? '#7CFF6B' : '#FFFFFF', strokeS)}>{neg ? `−${-n}` : n}</span>
+			</div>,
+		);
+	}
+	if (lf >= 0) els.push(<Cap key="cap" lf={lf - 12} fps={fps} top={1265} lines={[['«трое в доме»', 44, '#FFFFFF'], ['их было ЧЕТВЕРО', 64, '#FF3B3B']]} step={9} />);
+	return <>{els}</>;
 };
 
 export const Concept: React.FC<P> = (p) => {
-	const m: Record<string, React.FC<P>> = {airport: Airport, tir: Tir, tabloid: Tabloid, cctv: Cctv, museum: Museum, captcha: Captcha, jar: Jar, tip: Tip, protocol: Protocol, ammo: Ammo, ticket: Ticket, trophy: Trophy};
+	const m: Record<string, React.FC<P>> = {airport: Airport, tir: Tir, tabloid: Tabloid, cctv: Cctv, museum: Museum, captcha: Captcha, jar: Jar, tip: Tip, boss: Boss, ammo: Ammo, theatre: Theatre, house: HouseCount};
 	const C = m[p.cfg.concept];
 	return C ? <C {...p} /> : null;
 };
