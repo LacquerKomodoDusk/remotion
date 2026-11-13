@@ -476,3 +476,39 @@ export const Weather: React.FC<{t: number; fps: number; kind: 'sun' | 'storm' | 
 		</group>
 	);
 };
+
+// ---------- v14: the hoped-for pirate token (gold coin with a skull) ----------
+export const PirateCoin: React.FC<{lf: number; fps: number; at: [number, number]; drop: number; scale: number}> = ({lf, fps, at, drop, scale}) => {
+	const g = useMemo(() => ({
+		coin: new THREE.CylinderGeometry(0.5, 0.5, 0.09, 48),
+		rim: new THREE.TorusGeometry(0.47, 0.035, 10, 48),
+		skull: new THREE.SphereGeometry(0.17, 24, 16),
+		jaw: new THREE.BoxGeometry(0.17, 0.08, 0.06),
+		eye: new THREE.SphereGeometry(0.045, 12, 8),
+		bone: new THREE.CapsuleGeometry(0.03, 0.5, 4, 8),
+	}), []);
+	if (lf < 0) return null;
+	const p = spring({frame: lf, fps, config: {damping: 9, stiffness: 150}});
+	const d = Math.max(0, lf - drop);
+	const [x, y] = px2w(at[0], at[1]);
+	const gold = {color: '#FFC83D', metal: 0.25, rough: 0.28, emissive: '#5A3A00'};
+	return (
+		<group position={[x + d * 0.01, y + (1 - p) * -0.8 - d * d * 0.0035, 0]} scale={p * scale * Math.max(0, 1 - d / 30)} rotation={[0, lf * 0.12, d * 0.08]}>
+			<group rotation={[Math.PI / 2, 0, 0]}>
+				<O geo={g.coin} {...gold} />
+			</group>
+			<O geo={g.rim} {...gold} pos={[0, 0, 0.05]} line={1} />
+			<O geo={g.rim} {...gold} pos={[0, 0, -0.05]} line={1} />
+			{[0.06, -0.06].map((z, k) => (
+				<group key={k} position={[0, 0.04, z]} rotation={[0, k ? Math.PI : 0, 0]}>
+					<O geo={g.bone} color="#F4F1E8" pos={[0, -0.05, 0]} rot={[0, 0, 0.8]} line={1.1} />
+					<O geo={g.bone} color="#F4F1E8" pos={[0, -0.05, 0]} rot={[0, 0, -0.8]} line={1.1} />
+					<O geo={g.skull} color="#F4F1E8" pos={[0, 0.06, 0.02]} scale={[1, 1, 0.5]} />
+					<O geo={g.jaw} color="#F4F1E8" pos={[0, -0.09, 0.02]} line={1.1} />
+					<mesh geometry={g.eye} position={[-0.065, 0.07, 0.11]}><meshBasicMaterial color="#11141B" /></mesh>
+					<mesh geometry={g.eye} position={[0.065, 0.07, 0.11]}><meshBasicMaterial color="#11141B" /></mesh>
+				</group>
+			))}
+		</group>
+	);
+};

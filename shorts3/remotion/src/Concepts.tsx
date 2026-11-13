@@ -2,7 +2,7 @@ import React from 'react';
 import {Easing, OffthreadVideo, Sequence, interpolate, spring} from 'remotion';
 import type {Cfg} from './Edit';
 import {FONT, NAVY} from './theme';
-import {Stage, Shells, Splinters, CrownTree, Curtains, Flowers, House, Pad, OniMask, Vinyl, Weather} from './Three3D';
+import {Stage, Shells, Splinters, CrownTree, Curtains, Flowers, House, Pad, OniMask, Vinyl, Weather, PirateCoin} from './Three3D';
 
 // Per-video "seasoning": one concept each + the ONE editorial caption (punchline).
 // Concept colours never reuse the subtitle emotion colours as text colour on purpose.
@@ -644,7 +644,7 @@ const Vhs: React.FC<P> = ({cfg, t, fps, layout}) => {
 };
 
 // v14 — gacha reveal: rarity meter climbs during the chest animation, crashes on «джем-трек»; replay "ожидание/реальность"
-const TIERS: [string, string][] = [['обычный', '#9AA3B8'], ['необычный', '#3DBA4E'], ['редкий', '#3A8DFF'], ['эпический', '#A24BFF'], ['ЛЕГЕНДАРНЫЙ', '#FFB020']];
+const TIERS: [string, string][] = [['обычный', '#9AA3B8'], ['редкий', '#3A8DFF'], ['эпический', '#A24BFF'], ['легендарный', '#FFB020'], ['ПИРАТСКИЙ ЖЕТОН?!', '#FFD23F']];
 const Gacha: React.FC<P> = ({cfg, t, fps, video}) => {
 	const G = cfg.gacha as {start: number; peak: number; crash: number; vinyl: number; vinylOut: number; chest: [number, number]; replay: [number, number, number, number]};
 	const els: React.ReactNode[] = [];
@@ -673,6 +673,22 @@ const Gacha: React.FC<P> = ({cfg, t, fps, video}) => {
 		const o = interpolate(rl, [0, 10], [0, 0.75], {extrapolateRight: 'clamp'}) * interpolate(t, [G.crash - 0.05, G.crash + 0.1], [1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
 		els.push(<div key="rays" style={{position: 'absolute', left: G.chest[0] - 900, top: G.chest[1] - 900, width: 1800, height: 1800, opacity: o, mixBlendMode: 'screen', background: `repeating-conic-gradient(from ${rl * 2}deg, rgba(255,200,60,0.55) 0deg 8deg, rgba(255,200,60,0) 8deg 22deg)`, WebkitMaskImage: 'radial-gradient(circle, #000 10%, transparent 60%)'}} />);
 	}
+	// the hoped-for pirate token rises over the chest, then drops away on the crash
+	const cl = (t - (G.peak - 0.6)) * fps;
+	if (cl >= 0 && t < G.crash + 0.7) els.push(<Stage key="coin"><PirateCoin lf={cl} fps={fps} at={[540, 560]} drop={(G.crash - (G.peak - 0.6)) * fps} scale={1.25} /></Stage>);
+	// the sad beat: rain over the frame for a second after the crash
+	if (t >= G.crash && t < G.crash + 1.3) {
+		const o = interpolate(t, [G.crash, G.crash + 0.1, G.crash + 1.1, G.crash + 1.3], [0, 1, 1, 0]);
+		els.push(
+			<svg key="rain" width={1080} height={1920} style={{position: 'absolute', left: 0, top: 0, opacity: o * 0.7}}>
+				{Array.from({length: 70}).map((_, i) => {
+					const x0 = (i * 157) % 1080;
+					const y0 = (((i * 263) % 1920) + (t - G.crash) * 2600) % 1920;
+					return <line key={i} x1={x0} y1={y0} x2={x0 - 10} y2={y0 + 60} stroke="#BFD4FF" strokeWidth={3} strokeLinecap="round" />;
+				})}
+			</svg>,
+		);
+	}
 	const vl = (t - G.vinyl) * fps;
 	if (vl >= 0 && t < G.vinylOut + 0.3) {
 		const outS = interpolate(t, [G.vinylOut, G.vinylOut + 0.3], [1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
@@ -681,7 +697,7 @@ const Gacha: React.FC<P> = ({cfg, t, fps, video}) => {
 	const [r0, rSrc, rate, rDur] = G.replay;
 	els.push(<ReplayPip key="rp" t={t} fps={fps} video={video} r0={r0} rSrc={rSrc} rate={rate} rDur={rDur} h={520} tag={(s) => (s < G.crash - 0.3 ? ['ОЖИДАНИЕ', '#FFB020'] : ['РЕАЛЬНОСТЬ', '#9AA3B8'])} />);
 	const lf = (t - cfg.punch.t) * fps;
-	if (lf >= 0) els.push(<Cap key="cap" lf={lf} fps={fps} top={1365} lines={[['ожидание: легендарка', 40, '#FFB020'], ['реальность: джем-трек', 48, '#FFFFFF']]} step={9} />);
+	if (lf >= 0) els.push(<Cap key="cap" lf={lf} fps={fps} top={1365} lines={[['ожидание: пиратский жетон', 38, '#FFD23F'], ['реальность: джем-трек', 50, '#FFFFFF']]} step={9} />);
 	return <>{els}</>;
 };
 

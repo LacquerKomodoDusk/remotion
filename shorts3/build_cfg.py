@@ -167,7 +167,7 @@ C[13]={"frames":978,"concept":"vhs",
  "sfx":[["rewind",1.3],["whoosh",4.85],["whoosh",6.45],["pop",6.89],["whoosh",9.35],["sub",9.41,0.2],["whoosh",10.95],["static",13.45],["whoosh",14.05],["hit",14.62],["hit",15.85]],
  "vhs":{"on":1.45,"off":13.45,"masks":[6.89,9.41],"maskOut":11.0,"hits":[14.62,15.85]},
  "punch":{"t":14.1}}
-# v14 — chest animation hypes a legendary, it is a jam track: «мне какую-то х**** дали — джем-трек»
+# v14 — he hoped for a very rare pirate token from the chest; it is a jam track: «мне какую-то х**** дали — джем-трек»
 C[14]={"frames":937,"concept":"gacha",
  "words":ws([("о",1.13,'joy',''),("б****",2.45,'anger','mat'),("мне",2.85,'irony',''),("какую-то",3.05,'irony',''),("х****",3.45,'irony','mat'),("дали",3.77,'irony',''),("джем-трек",4.25,'irony','shout'),
    ("ты",7.95,'confident',''),("правильно",8.11,'confident',''),("писал",8.63,'confident',''),("не",9.35,'confident',''),("монета",9.55,'confident',''),("же",10.03,'confident',''),
@@ -176,7 +176,7 @@ C[14]={"frames":937,"concept":"gacha",
  "layouts":[[0,'game_full'],[2.45,'cam_full'],[5.7,'game_full'],[7.8,'split'],[10.45,'cam_full'],[11.6,'split']],
  "gameFull":GF,"gameKeys":[[0,1.15,0.55,0.4],[1.3,1.3,0.55,0.38],[2.4,1.3,0.55,0.38],[5.7,1.0,0.5,0.45],[7.7,1.0,0.5,0.45],[7.8,1.0,0.5,0.5]],
  "punches":[[1.3,'game',0.10],[2.45,'cam',0.16],[4.25,'cam',0.08],[10.51,'cam',0.12],[13.95,'cam',0.10]],
- "loud":[[0,2.45],[5.7,7.8]],
+ "loud":[[0,2.45],[5.7,7.8]],"grades":[[2.45,3.75,"grayscale(0.75) sepia(0.35) hue-rotate(180deg) brightness(0.82)","all"]],
  "sfx":[["drumroll",0.3,1.6],["sub",1.9,0.3],["trombone",2.45],["jam",2.95],["whoosh",5.6],["whoosh",7.75],["whoosh",10.4],["rewind",11.55]],
  "gacha":{"start":0.3,"peak":1.9,"crash":2.45,"vinyl":2.9,"vinylOut":5.6,"chest":[637,603],"replay":[11.75,0.2,0.7,3.8]},
  "punch":{"t":13.4}}
