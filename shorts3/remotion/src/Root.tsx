@@ -12,7 +12,11 @@ import c9 from './configs/v9.json';
 import c10 from './configs/v10.json';
 import c11 from './configs/v11.json';
 import c12 from './configs/v12.json';
-const all = [c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12] as unknown as (Cfg & {frames: number})[];
+import c13 from './configs/v13.json';
+import c14 from './configs/v14.json';
+import c15 from './configs/v15.json';
+import c16 from './configs/v16.json';
+const all = [c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16] as unknown as (Cfg & {frames: number})[];
 export const RemotionRoot: React.FC = () => (
 	<>
 		{all.map((cfg, i) => (

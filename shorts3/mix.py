@@ -83,5 +83,28 @@ for e in cfg['sfx']:
   elif kind=='kill':    # heavier marker + ding
     t=T(0.06); c=np.sin(2*np.pi*3000*t)*0.6+sosfilt(butter(2,3000,'high',fs=SR,output='sos'),rng.standard_normal(len(t)))*0.5
     add(c*np.exp(-t*60)*0.26,t0); add(tone([(2637,1),(5274,.3)],0.4,9,0.10),t0+0.01); t=T(0.2); add(np.sin(2*np.pi*(90+60*np.exp(-t*30))*t)*np.exp(-t*18)*0.3,t0)
+  elif kind=='drumroll': # snare roll with crescendo
+    d=e[2]; n=int(d*SR); s_=np.zeros(n); r=0.0
+    while r<d:
+      a=int(r*SR); L=int(0.03*SR); seg=sosfilt(bp(800,6000),rng.standard_normal(L))*np.exp(-np.arange(L)/SR*90)
+      s_[a:a+L]+=seg[:max(0,min(L,n-a))]*(0.35+0.65*r/d); r+=0.045
+    add(s_*0.10,t0)
+  elif kind=='trombone': # sad wah-wah-wah-waaah
+    for i,(f,dd) in enumerate(((311,0.32),(294,0.32),(277,0.32),(262,0.9))):
+      t=T(dd); vib=np.sin(2*np.pi*5.5*t)*(4 if i==3 else 0); ph=2*np.pi*np.cumsum(f+vib)/SR
+      s_=sum(np.sin(h*ph)/h for h in range(1,9)); s_=sosfilt(bp(150,2500),s_)
+      add(s_*np.minimum(1,t/0.03)*np.minimum(1,(dd-t)/0.05)*0.10,t0+i*0.34)
+  elif kind=='jam':     # cheesy synth riff
+    notes=(523,659,784,659,880,784,659,523); 
+    for i,f in enumerate(notes):
+      t=T(0.16); sq=np.sign(np.sin(2*np.pi*f*t))*0.5+np.sin(2*np.pi*f/2*t)
+      add(sosfilt(butter(2,3000,'low',fs=SR,output='sos'),sq)*np.exp(-t*8)*0.05,t0+i*0.17)
+  elif kind=='beep':    # scanner blip
+    t=T(0.07); add(np.sin(2*np.pi*1900*t)*np.minimum(1,(0.07-t)/0.01)*0.09,t0)
+  elif kind=='static':  # VHS stop / static burst
+    t=T(0.3); add(sosfilt(bp(1000,9000),rng.standard_normal(len(t)))*np.minimum(1,(0.3-t)/0.05)*0.10,t0)
+  elif kind=='thunder': # crack + rumble
+    t=T(1.6); s_=sosfilt(butter(2,600,'low',fs=SR,output='sos'),rng.standard_normal(len(t)))*np.exp(-t*2.2)*1.2
+    s_[:int(0.05*SR)]+=sosfilt(bp(1500,8000),rng.standard_normal(int(0.05*SR)))*0.8; add(s_*0.22,t0)
 y[-int(.004*SR):]*=np.linspace(1,0,int(.004*SR))[:,None]
 sf.write(f'v{v}/work/mix_premaster.wav',y.astype(np.float32),SR); print(v,'peak',round(float(np.abs(y).max()),3))

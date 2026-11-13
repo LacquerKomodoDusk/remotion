@@ -2,7 +2,7 @@ import React from 'react';
 import {Easing, OffthreadVideo, Sequence, interpolate, spring} from 'remotion';
 import type {Cfg} from './Edit';
 import {FONT, NAVY} from './theme';
-import {Stage, Shells, Splinters, CrownTree, Curtains, Flowers, House, Pad} from './Three3D';
+import {Stage, Shells, Splinters, CrownTree, Curtains, Flowers, House, Pad, OniMask, Vinyl, Weather} from './Three3D';
 
 // Per-video "seasoning": one concept each + the ONE editorial caption (punchline).
 // Concept colours never reuse the subtitle emotion colours as text colour on purpose.
@@ -548,9 +548,238 @@ const HouseCount: React.FC<P> = ({cfg, t, fps, layout}) => {
 	if (lf >= 0) els.push(<Cap key="cap" lf={lf - 12} fps={fps} top={1265} lines={[['«трое в доме»', 44, '#FFFFFF'], ['их было ЧЕТВЕРО', 64, '#FF3B3B']]} step={9} />);
 	return <>{els}</>;
 };
+// ---------------- shared live tools (v13+) ----------------
+const XHAIR: Record<string, [number, number]> = {game_full: [550, 908], split: [540, 1340], cam_full: [540, 1650]};
+const hitMarks = (t: number, fps: number, layout: L, hits: number[], kills: number[]) => {
+	const xa = XHAIR[layout.from], xb = XHAIR[layout.to];
+	const cx = lerpN(xa[0], xb[0], layout.p), cy = lerpN(xa[1], xb[1], layout.p);
+	const out: React.ReactNode[] = [];
+	for (const [list, kill] of [[hits, false], [kills, true]] as [number[], boolean][]) {
+		for (const h of list) {
+			const k = (t - h) * fps;
+			if (k < 0 || k > (kill ? 16 : 9)) continue;
+			const p = kill ? interpolate(k, [0, 3, 16], [1.5, 1.0, 1.1]) : interpolate(k, [0, 2, 9], [1.35, 1, 1]);
+			const o = interpolate(k, kill ? [10, 16] : [5, 9], [1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+			const col = kill ? '#FF2A2A' : '#FFFFFF';
+			const gap = kill ? 22 : 16, len = kill ? 40 : 28, w = kill ? 9 : 6;
+			out.push(
+				<svg key={`hm${h}`} width={240} height={240} style={{position: 'absolute', left: cx - 120, top: cy - 120, opacity: o, transform: `scale(${p})`, filter: 'drop-shadow(0 0 3px rgba(0,0,0,0.9))'}}>
+					{[45, 135, 225, 315].map((a2) => {
+						const r = (a2 * Math.PI) / 180;
+						return <line key={a2} x1={120 + Math.cos(r) * gap} y1={120 + Math.sin(r) * gap} x2={120 + Math.cos(r) * (gap + len)} y2={120 + Math.sin(r) * (gap + len)} stroke={col} strokeWidth={w} strokeLinecap="square" />;
+					})}
+				</svg>,
+			);
+		}
+	}
+	return out;
+};
+// slow replay picture-in-picture over the game area; `tag` and `over` decide the label and drawn overlay
+const ReplayPip: React.FC<{t: number; fps: number; video: string; r0: number; rSrc: number; rate: number; rDur: number; h: number; tag: (srcT: number) => [string, string]; over?: (srcT: number, k: number) => React.ReactNode}> = ({t, fps, video, r0, rSrc, rate, rDur, h, tag, over}) => {
+	if (t < r0 - 0.2 || t >= r0 + rDur + 0.2) return null;
+	const lf = (t - r0) * fps;
+	const sIn = interpolate(lf, [-12, 0], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.out(Easing.back(1.6))});
+	const sOut = interpolate(t, [r0 + rDur, r0 + rDur + 0.2], [1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+	const srcT = rSrc + Math.max(0, t - r0) * rate;
+	const W = 800, k = W / 918, SY = 604;
+	const [label, col] = tag(srcT);
+	return (
+		<div style={{position: 'absolute', left: 60, top: 830, width: W, height: h, transform: `scale(${sIn * sOut})`, borderRadius: 26, overflow: 'hidden', border: `7px solid ${NAVY}`, boxShadow: `0 14px 0 ${NAVY}`}}>
+			<Sequence from={Math.round(r0 * fps)} layout="none">
+				<OffthreadVideo src={video} muted startFrom={Math.round(rSrc * fps)} playbackRate={rate} style={{position: 'absolute', left: 0, top: -SY * k, width: 918 * k, height: 1632 * k, maxWidth: 'none', filter: 'contrast(1.08)'}} />
+			</Sequence>
+			{over ? over(srcT, k) : null}
+			<div style={{position: 'absolute', left: 18, top: 16, display: 'flex', alignItems: 'center', gap: 10, background: 'rgba(11,21,48,0.85)', borderRadius: 12, padding: '6px 14px'}}>
+				<div style={{width: 18, height: 18, borderRadius: 9, background: col, opacity: Math.floor(t * 3) % 2 ? 1 : 0.3}} />
+				<span style={txt(28, '#FFFFFF')}>{label}</span>
+			</div>
+		</div>
+	);
+};
+
+// v13 — «раньше было лучше»: the past plays as a VHS tape (rewind → PLAY), masks in 3D, STOP → back to LIVE
+const Vhs: React.FC<P> = ({cfg, t, fps, layout}) => {
+	const V = cfg.vhs as {on: number; off: number; masks: [number, number]; maskOut: number; hits: number[]};
+	const els: React.ReactNode[] = [];
+	const inTape = t >= V.on && t < V.off;
+	if (inTape) {
+		const k = (t - V.on) * fps;
+		const rew = k < 22;
+		const band = ((t - V.on) * 0.35) % 1.3 - 0.15;
+		els.push(
+			<div key="vhs" style={{position: 'absolute', inset: 0, pointerEvents: 'none'}}>
+				<div style={{position: 'absolute', inset: 0, backgroundImage: 'repeating-linear-gradient(0deg, rgba(0,0,0,0.18) 0 2px, rgba(0,0,0,0) 2px 4px)'}} />
+				<div style={{position: 'absolute', left: 0, right: 0, top: `${band * 100}%`, height: 60, background: 'linear-gradient(rgba(255,255,255,0), rgba(255,255,255,0.16), rgba(255,255,255,0))', transform: `translateX(${Math.sin(t * 50) * 8}px)`}} />
+				{rew ? <div style={{position: 'absolute', inset: 0, backgroundImage: 'repeating-linear-gradient(0deg, rgba(255,255,255,0.12) 0 3px, rgba(0,0,0,0) 3px 23px)', transform: `translateY(${(k * 37) % 23}px)`}} /> : null}
+				<div style={{position: 'absolute', left: 60, top: 205, ...txt(52, '#FFFFFF', {textShadow: '3px 0 0 rgba(255,0,60,0.7), -3px 0 0 rgba(0,200,255,0.7)'})}}>{rew ? '◀◀ REW' : Math.floor(t * 2) % 2 ? 'PLAY ▶' : 'PLAY'}</div>
+				<div style={{position: 'absolute', left: 60, top: 1440, ...txt(34, '#FFFFFF', {textShadow: '3px 0 0 rgba(255,0,60,0.7), -3px 0 0 rgba(0,200,255,0.7)'})}}>РАНЬШЕ · 0:{`0${Math.floor((t - V.on) / 60)}`.slice(-2)}:{`0${Math.floor(t - V.on) % 60}`.slice(-2)}</div>
+			</div>,
+		);
+	}
+	const sk = (t - V.off) * fps;
+	if (sk >= 0 && sk < 16) {
+		els.push(
+			<div key="stop" style={{position: 'absolute', inset: 0, background: `repeating-linear-gradient(${(sk * 47) % 180}deg, #777 0 2px, #222 2px 4px)`, opacity: interpolate(sk, [0, 12, 16], [0.9, 0.6, 0])}}>
+				<div style={{position: 'absolute', left: 60, top: 205, ...txt(52, '#FFFFFF')}}>■ STOP</div>
+			</div>,
+		);
+	}
+	if (t >= V.off + 0.25) {
+		els.push(
+			<div key="live" style={{position: 'absolute', left: 60, top: 205, display: 'flex', alignItems: 'center', gap: 12, background: RED, border: `5px solid ${NAVY}`, borderRadius: 14, padding: '6px 18px', boxShadow: `0 6px 0 ${NAVY}`}}>
+				<div style={{width: 18, height: 18, borderRadius: 9, background: '#FFFFFF', opacity: Math.floor(t * 2.5) % 2 ? 1 : 0.35}} />
+				<span style={txt(34, '#FFFFFF')}>СЕЙЧАС</span>
+			</div>,
+		);
+	}
+	const ml = (t - V.masks[0]) * fps;
+	if (ml >= 0 && t < V.maskOut + 0.3) {
+		const outS = interpolate(t, [V.maskOut, V.maskOut + 0.3], [1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+		els.push(<Stage key="mask"><OniMask lf={ml} fps={fps} at={[459, 1180]} flip={(V.masks[1] - V.masks[0]) * fps} scale={0.85 * outS} /></Stage>);
+	}
+	els.push(...hitMarks(t, fps, layout, V.hits, []));
+	const lf = (t - cfg.punch.t) * fps;
+	if (lf >= 0) els.push(<Cap key="cap" lf={lf} fps={fps} top={1180} lines={[['РАНЬШЕ: маски и мувмент', 44, '#FFD23F'], ['СЕЙЧАС: мишень и палка', 50, '#FFFFFF']]} step={10} />);
+	return <>{els}</>;
+};
+
+// v14 — gacha reveal: rarity meter climbs during the chest animation, crashes on «джем-трек»; replay "ожидание/реальность"
+const TIERS: [string, string][] = [['обычный', '#9AA3B8'], ['необычный', '#3DBA4E'], ['редкий', '#3A8DFF'], ['эпический', '#A24BFF'], ['ЛЕГЕНДАРНЫЙ', '#FFB020']];
+const Gacha: React.FC<P> = ({cfg, t, fps, video}) => {
+	const G = cfg.gacha as {start: number; peak: number; crash: number; vinyl: number; vinylOut: number; chest: [number, number]; replay: [number, number, number, number]};
+	const els: React.ReactNode[] = [];
+	if (t >= G.start && t < G.vinylOut + 0.5) {
+		const rise = interpolate(t, [G.start, G.peak], [0.05, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.in(Easing.quad)});
+		const crash = interpolate(t, [G.crash, G.crash + 0.35], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.in(Easing.cubic)});
+		const v = rise * (1 - crash * 0.97);
+		const tier = crash > 0.5 ? (['ДЖЕМ-ТРЕК', '#6B6656'] as [string, string]) : TIERS[Math.min(4, Math.floor(v * 4.999))];
+		const shake = t < G.crash && rise > 0.8 ? Math.sin(t * 90) * 4 : 0;
+		const o = interpolate(t, [G.vinylOut, G.vinylOut + 0.5], [1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+		els.push(
+			<div key="m" style={{position: 'absolute', left: 60, top: 205, width: 620, opacity: o, transform: `translate(${shake}px, ${shake * 0.6}px)`}}>
+				<div style={{display: 'flex', alignItems: 'baseline', gap: 14}}>
+					<span style={txt(28, '#FFFFFF', strokeS)}>РЕДКОСТЬ:</span>
+					<span style={txt(44, tier[1], {...strokeS, transform: crash > 0.5 ? `rotate(${Math.sin(t * 6) * 2}deg)` : undefined})}>{tier[0]}</span>
+				</div>
+				<div style={{marginTop: 10, height: 34, borderRadius: 10, border: `5px solid ${NAVY}`, background: '#1A1F2E', overflow: 'hidden', position: 'relative', boxShadow: `0 6px 0 ${NAVY}`}}>
+					<div style={{position: 'absolute', left: 0, top: 0, bottom: 0, width: `${v * 100}%`, background: crash > 0.5 ? '#6B6656' : `linear-gradient(90deg, #9AA3B8, #3DBA4E 30%, #3A8DFF 55%, #A24BFF 75%, #FFB020)`}} />
+				</div>
+			</div>,
+		);
+	}
+	// golden rays during the climax of the chest animation
+	const rl = (t - (G.peak - 0.7)) * fps;
+	if (rl >= 0 && t < G.crash + 0.1) {
+		const o = interpolate(rl, [0, 10], [0, 0.75], {extrapolateRight: 'clamp'}) * interpolate(t, [G.crash - 0.05, G.crash + 0.1], [1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+		els.push(<div key="rays" style={{position: 'absolute', left: G.chest[0] - 900, top: G.chest[1] - 900, width: 1800, height: 1800, opacity: o, mixBlendMode: 'screen', background: `repeating-conic-gradient(from ${rl * 2}deg, rgba(255,200,60,0.55) 0deg 8deg, rgba(255,200,60,0) 8deg 22deg)`, WebkitMaskImage: 'radial-gradient(circle, #000 10%, transparent 60%)'}} />);
+	}
+	const vl = (t - G.vinyl) * fps;
+	if (vl >= 0 && t < G.vinylOut + 0.3) {
+		const outS = interpolate(t, [G.vinylOut, G.vinylOut + 0.3], [1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+		els.push(<Stage key="vin"><Vinyl lf={vl} fps={fps} at={[160, 1170]} scale={0.55 * outS} /></Stage>);
+	}
+	const [r0, rSrc, rate, rDur] = G.replay;
+	els.push(<ReplayPip key="rp" t={t} fps={fps} video={video} r0={r0} rSrc={rSrc} rate={rate} rDur={rDur} h={520} tag={(s) => (s < G.crash - 0.3 ? ['ОЖИДАНИЕ', '#FFB020'] : ['РЕАЛЬНОСТЬ', '#9AA3B8'])} />);
+	const lf = (t - cfg.punch.t) * fps;
+	if (lf >= 0) els.push(<Cap key="cap" lf={lf} fps={fps} top={1365} lines={[['ожидание: легендарка', 40, '#FFB020'], ['реальность: джем-трек', 48, '#FFFFFF']]} step={9} />);
+	return <>{els}</>;
+};
+
+// v15 — bot scanner: locks the enemy («бот 97%»), then rescans HIM stuck in the window («бот 100%»); hope meter → «+0»
+const scanBox = (t: number, fps: number, c: [number, number], w: number, h: number, from: number, label: number, pct: number, key: string) => {
+	const k = (t - from) * fps;
+	const p = spring({frame: k, fps, config: {damping: 12, stiffness: 200}});
+	const sz = lerpN(1.8, 1, p);
+	const scanY = ((k * 9) % h);
+	const shown = t >= label;
+	const num = shown ? Math.round(interpolate((t - label) * fps, [0, 14], [0, pct], {extrapolateRight: 'clamp'})) : 0;
+	const corner = (x: number, y: number, dx: number, dy: number) => <path d={`M${x + dx * 36} ${y} L${x} ${y} L${x} ${y + dy * 36}`} stroke="#FF2A2A" strokeWidth={8} fill="none" />;
+	return (
+		<div key={key} style={{position: 'absolute', left: c[0] - (w * sz) / 2, top: c[1] - (h * sz) / 2, width: w * sz, height: h * sz, opacity: Math.min(1, k / 3)}}>
+			<svg width={w * sz} height={h * sz} style={{position: 'absolute', inset: 0, overflow: 'visible'}}>
+				{corner(0, 0, 1, 1)}{corner(w * sz, 0, -1, 1)}{corner(0, h * sz, 1, -1)}{corner(w * sz, h * sz, -1, -1)}
+				{!shown ? <line x1={0} x2={w * sz} y1={scanY * sz} y2={scanY * sz} stroke="#FF2A2A" strokeWidth={4} opacity={0.8} /> : null}
+			</svg>
+			<div style={{position: 'absolute', left: 0, top: -78, whiteSpace: 'nowrap', background: '#FF2A2A', border: `4px solid ${NAVY}`, borderRadius: 10, padding: '4px 12px'}}>
+				<span style={txt(42, '#FFFFFF')}>{shown ? `БОТ: ${num}%` : 'СКАН…'}</span>
+			</div>
+		</div>
+	);
+};
+const BotScan: React.FC<P> = ({cfg, t, fps, video}) => {
+	const B = cfg.bot as {lock: [number, number]; enemy: [number, number]; label: number; self: [number, number]; me: [number, number]; selfLabel: number; meter: [number, number]; drain: number; replay: [number, number, number, number]; mePip: [number, number]};
+	const els: React.ReactNode[] = [];
+	if (t >= B.lock[0] && t < B.lock[1]) els.push(scanBox(t, fps, B.enemy, 230, 330, B.lock[0], B.label, 97, 'e'));
+	if (t >= B.self[0] && t < B.self[1]) els.push(scanBox(t, fps, B.me, 260, 380, B.self[0], B.selfLabel, 100, 'me'));
+	// hope meter: fills while he dreams of the «шедевр», drains to +0 when the rank is merely protected
+	const [m0, m1] = B.meter;
+	const inM = (t >= m0 && t < B.replay[0]) || t >= B.drain - 1.6;
+	if (t >= m0 && inM) {
+		const fill = interpolate(t, [m0, m1], [0.05, 0.92], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'}) * interpolate(t, [B.drain, B.drain + 0.5], [1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.in(Easing.cubic)});
+		const drained = t >= B.drain + 0.5;
+		els.push(
+			<div key="mt" style={{position: 'absolute', left: 70, top: 1300, width: 780}}>
+				<div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'baseline'}}>
+					<span style={txt(30, '#FFFFFF', strokeS)}>ШЕДЕВР-МЕТР</span>
+					<span style={txt(48, drained ? '#FF3B3B' : '#7CFF6B', strokeS)}>{drained ? '+0' : `${Math.round(fill * 100)}%`}</span>
+				</div>
+				<div style={{marginTop: 8, height: 32, borderRadius: 10, border: `5px solid ${NAVY}`, background: '#1A1F2E', overflow: 'hidden', position: 'relative', boxShadow: `0 6px 0 ${NAVY}`}}>
+					<div style={{position: 'absolute', left: 0, top: 0, bottom: 0, width: `${fill * 100}%`, background: 'linear-gradient(90deg, #3DBA4E, #7CFF6B, #FFD23F)'}} />
+				</div>
+			</div>,
+		);
+	}
+	const [r0, rSrc, rate, rDur] = B.replay;
+	els.push(
+		<ReplayPip key="rp" t={t} fps={fps} video={video} r0={r0} rSrc={rSrc} rate={rate} rDur={rDur} h={520} tag={() => ['ПОВТОР ×0.5', RED]}
+			over={(srcT, k) => (srcT >= B.self[0] && srcT < B.self[1] + 0.1 ? <div style={{position: 'absolute', left: B.mePip[0] * k - 70, top: (B.mePip[1] - 604) * k - 110, width: 140, height: 220, border: '6px solid #FF2A2A', borderRadius: 8}} /> : null)} />,
+	);
+	const lf = (t - cfg.punch.t) * fps;
+	if (lf >= 0 && t < B.drain - 1.6) els.push(<Cap key="cap" lf={lf} fps={fps} top={1365} lines={[['БОТ НАЙДЕН', 52, '#FF3B3B'], ['застрял в окне', 42, '#FFFFFF']]} step={9} />);
+	return <>{els}</>;
+};
+
+// v16 — TV weather forecast: «никого же нету» = sunny, «ой, есть» = storm warning + crawl, «застроился» = bricks
+const Forecast: React.FC<P> = ({cfg, t, fps}) => {
+	const F = cfg.fc as {sun: number; storm: number; wall: number; crawl: [number, number]};
+	const els: React.ReactNode[] = [];
+	const kind: 'sun' | 'storm' | 'wall' = t >= F.wall ? 'wall' : t >= F.storm ? 'storm' : 'sun';
+	const since = kind === 'wall' ? F.wall : kind === 'storm' ? F.storm : F.sun;
+	const lf = (t - cfg.punch.t) * fps;
+	if (t >= F.sun && lf < 0) {
+		const [title, line, col] = kind === 'sun' ? ['ЯСНО', 'людей: 0%', '#FFD23F'] : kind === 'storm' ? ['ГРОЗА', 'осадки: пули', '#FF3B3B'] : ['СТРОЙКА', 'местами стены', '#FF8A3D'];
+		const k = (t - since) * fps;
+		const flip = interpolate(k, [0, 8], [90, 0], {extrapolateRight: 'clamp', easing: Easing.out(Easing.back(2))});
+		els.push(
+			<div key="w" style={{position: 'absolute', left: 50, top: 200, width: 470, height: 170, perspective: 700}}>
+				<div style={{transform: `rotateX(${flip}deg)`, background: 'linear-gradient(135deg, #1F4FD8, #12307E)', border: `5px solid ${NAVY}`, borderRadius: 22, boxShadow: `0 8px 0 ${NAVY}`, height: '100%', paddingLeft: 180, display: 'flex', flexDirection: 'column', justifyContent: 'center'}}>
+					<div style={txt(22, '#A9C2FF', {letterSpacing: '0.16em'})}>ПРОГНОЗ</div>
+					<div style={txt(46, col, {marginTop: 4})}>{title}</div>
+					<div style={txt(26, '#FFFFFF', {marginTop: 4})}>{line}</div>
+				</div>
+			</div>,
+		);
+		els.push(<Stage key={`ic-${kind}`}><Weather t={t} fps={fps} kind={kind} since={since} at={[140, 285]} scale={0.5} /></Stage>);
+	}
+	const [c0, c1] = F.crawl;
+	if (t >= c0 && t < c1) {
+		const o = interpolate(t, [c0, c0 + 0.15, c1 - 0.2, c1], [0, 1, 1, 0]);
+		const msg = '⚠ ШТОРМОВОЕ ПРЕДУПРЕЖДЕНИЕ · В РАЙОНЕ ПОСАДКИ ОБНАРУЖЕН ЧЕЛОВЕК · ОСАДКИ В ВИДЕ ПУЛЬ · ';
+		els.push(
+			<div key="cr" style={{position: 'absolute', left: 0, top: 1450, width: 1080, height: 70, opacity: o, background: '#E8322B', borderTop: `5px solid ${NAVY}`, borderBottom: `5px solid ${NAVY}`, overflow: 'hidden'}}>
+				<div style={{position: 'absolute', top: 10, left: 1080 - (t - c0) * 420, ...txt(40, '#FFFFFF')}}>{msg + msg}</div>
+			</div>,
+		);
+	}
+	if (lf >= 0) {
+		els.push(<Stage key="wall"><Weather t={t} fps={fps} kind="wall" since={F.wall} at={[459, 1060]} scale={lerpN(0.5, 1.0, Math.min(1, lf / 14))} /></Stage>);
+		els.push(<Cap key="cap" lf={lf - 6} fps={fps} top={1260} lines={[['ПРОГНОЗ: никого', 44, '#FFD23F'], ['ФАКТ: гроза и стройка', 50, '#FFFFFF']]} step={9} />);
+	}
+	return <>{els}</>;
+};
 
 export const Concept: React.FC<P> = (p) => {
-	const m: Record<string, React.FC<P>> = {airport: Airport, tir: Tir, tabloid: Tabloid, cctv: Cctv, museum: Museum, captcha: Captcha, jar: Jar, tip: Tip, boss: Boss, ammo: Ammo, theatre: Theatre, house: HouseCount};
+	const m: Record<string, React.FC<P>> = {airport: Airport, tir: Tir, tabloid: Tabloid, cctv: Cctv, museum: Museum, captcha: Captcha, jar: Jar, tip: Tip, boss: Boss, ammo: Ammo, theatre: Theatre, house: HouseCount, vhs: Vhs, gacha: Gacha, bot: BotScan, forecast: Forecast};
 	const C = m[p.cfg.concept];
 	return C ? <C {...p} /> : null;
 };

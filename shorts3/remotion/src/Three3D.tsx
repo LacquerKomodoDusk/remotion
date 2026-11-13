@@ -362,3 +362,117 @@ export const Pad: React.FC<{lf: number; fps: number; at: [number, number]; shake
 		</group>
 	);
 };
+
+// ---------- v13: oni mask ----------
+export const OniMask: React.FC<{lf: number; fps: number; at: [number, number]; flip: number; scale: number}> = ({lf, fps, at, flip, scale}) => {
+	const g = useMemo(() => ({
+		face: new THREE.SphereGeometry(0.5, 32, 24),
+		horn: new THREE.ConeGeometry(0.09, 0.42, 16),
+		eye: new THREE.BoxGeometry(0.22, 0.07, 0.08),
+		brow: new THREE.BoxGeometry(0.26, 0.06, 0.08),
+		tooth: new THREE.ConeGeometry(0.05, 0.14, 4),
+	}), []);
+	if (lf < 0) return null;
+	const p = spring({frame: lf, fps, config: {damping: 9, stiffness: 180}});
+	const fp = spring({frame: lf - flip, fps, config: {damping: 10, stiffness: 160}});
+	const voidMode = lf >= flip;
+	const col = voidMode ? '#6B2BD8' : '#E8322B';
+	const [x, y] = px2w(at[0], at[1]);
+	return (
+		<group position={[x, y, 0]} scale={p * scale} rotation={[0.1, (1 - p) * 4 + fp * Math.PI * 2 + Math.sin(lf / 18) * 0.25, Math.sin(lf / 23) * 0.08]}>
+			<O geo={g.face} color={col} emissive={voidMode ? '#220044' : '#300000'} scale={[1, 1.12, 0.55]} />
+			<O geo={g.horn} color="#F4F1E8" pos={[-0.3, 0.6, 0]} rot={[0, 0, 0.35]} />
+			<O geo={g.horn} color="#F4F1E8" pos={[0.3, 0.6, 0]} rot={[0, 0, -0.35]} />
+			<O geo={g.brow} color="#11141B" pos={[-0.19, 0.2, 0.27]} rot={[0, 0, -0.35]} line={1} />
+			<O geo={g.brow} color="#11141B" pos={[0.19, 0.2, 0.27]} rot={[0, 0, 0.35]} line={1} />
+			<mesh geometry={g.eye} position={[-0.18, 0.08, 0.28]}><meshBasicMaterial color={voidMode ? '#C9A2FF' : '#FFD23F'} /></mesh>
+			<mesh geometry={g.eye} position={[0.18, 0.08, 0.28]}><meshBasicMaterial color={voidMode ? '#C9A2FF' : '#FFD23F'} /></mesh>
+			{[-0.16, -0.05, 0.05, 0.16].map((tx, i) => <O key={i} geo={g.tooth} color="#FFFFFF" pos={[tx, -0.28, 0.26]} rot={[Math.PI, 0, 0]} line={1.05} />)}
+		</group>
+	);
+};
+
+// ---------- v14: vinyl record + notes ----------
+export const Vinyl: React.FC<{lf: number; fps: number; at: [number, number]; scale: number}> = ({lf, fps, at, scale}) => {
+	const g = useMemo(() => ({
+		disc: new THREE.CylinderGeometry(0.6, 0.6, 0.04, 48),
+		label: new THREE.CylinderGeometry(0.2, 0.2, 0.05, 32),
+		groove: new THREE.TorusGeometry(0.42, 0.006, 6, 48),
+		head: new THREE.SphereGeometry(0.07, 16, 12),
+		stem: new THREE.BoxGeometry(0.025, 0.26, 0.025),
+	}), []);
+	if (lf < 0) return null;
+	const p = spring({frame: lf, fps, config: {damping: 8, stiffness: 160}});
+	const [x, y] = px2w(at[0], at[1]);
+	return (
+		<group position={[x, y, 0]} scale={p * scale}>
+			<group rotation={[1.1, 0, (lf / 8) % (Math.PI * 2)]}>
+				<O geo={g.disc} color="#15171E" rough={0.25} metal={0.3} />
+				<O geo={g.label} color="#FF3B5C" emissive="#300010" line={1} />
+				<mesh geometry={g.groove} rotation={[Math.PI / 2, 0, 0]} position={[0, 0.025, 0]}><meshBasicMaterial color="#3A3F4A" /></mesh>
+				<mesh geometry={g.groove} rotation={[Math.PI / 2, 0, 0]} position={[0, 0.025, 0]} scale={0.8}><meshBasicMaterial color="#3A3F4A" /></mesh>
+			</group>
+			{[0, 1, 2].map((i) => {
+				const l = (lf + i * 14) % 42;
+				return (
+					<group key={i} position={[(i - 1) * 0.45, 0.45 + l * 0.02, 0.2]} scale={Math.sin((l / 42) * Math.PI)} rotation={[0, 0, Math.sin(l / 6) * 0.3]}>
+						<O geo={g.head} color="#FFD23F" scale={[1.2, 0.9, 0.9]} />
+						<O geo={g.stem} color="#FFD23F" pos={[0.07, 0.13, 0]} />
+					</group>
+				);
+			})}
+		</group>
+	);
+};
+
+// ---------- v16: weather icons (sun / storm cloud / brick wall) ----------
+export const Weather: React.FC<{t: number; fps: number; kind: 'sun' | 'storm' | 'wall'; since: number; at: [number, number]; scale: number}> = ({t, fps, kind, since, at, scale}) => {
+	const g = useMemo(() => {
+		const bolt = new THREE.Shape();
+		[[0.05, 0.3], [-0.12, 0.0], [0.0, 0.0], [-0.08, -0.32], [0.14, 0.04], [0.02, 0.04], [0.12, 0.3]].forEach(([bx, by], i) => (i ? bolt.lineTo(bx, by) : bolt.moveTo(bx, by)));
+		return {
+			sun: new THREE.SphereGeometry(0.32, 32, 24),
+			ray: new THREE.ConeGeometry(0.06, 0.2, 8),
+			puff: new THREE.SphereGeometry(0.22, 24, 16),
+			bolt: new THREE.ExtrudeGeometry(bolt, {depth: 0.06, bevelEnabled: false}),
+			brick: new THREE.BoxGeometry(0.3, 0.14, 0.16),
+		};
+	}, []);
+	const lf = (t - since) * fps;
+	const p = spring({frame: lf, fps, config: {damping: 9, stiffness: 190}});
+	const [x, y] = px2w(at[0], at[1]);
+	return (
+		<group position={[x, y, 0]} scale={p * scale} rotation={[0.15, Math.sin(t * 1.3) * 0.3, 0]}>
+			{kind === 'sun' ? (
+				<group rotation={[0, 0, t * 0.8]}>
+					<O geo={g.sun} color="#FFC83D" emissive="#7A4A00" />
+					{Array.from({length: 8}).map((_, i) => {
+						const a = (i / 8) * Math.PI * 2;
+						return <O key={i} geo={g.ray} color="#FFD23F" emissive="#5A3A00" pos={[Math.cos(a) * 0.48, Math.sin(a) * 0.48, 0]} rot={[0, 0, a - Math.PI / 2]} />;
+					})}
+				</group>
+			) : null}
+			{kind === 'storm' ? (
+				<group position={[Math.sin(t * 40) * 0.02 * Math.max(0, 1 - lf / 20), 0, 0]}>
+					{[[-0.22, 0.05, 0.9], [0.05, 0.14, 1.15], [0.28, 0.02, 0.85], [0.02, -0.06, 1]].map(([px, py, s2], i) => (
+						<O key={i} geo={g.puff} color="#5B6478" pos={[px, py, 0]} scale={s2} />
+					))}
+					<group position={[0, -0.32 - ((lf % 30) < 4 ? 0.04 : 0), 0.15]} scale={(lf % 30) < 18 ? 1 : 0.0001}>
+						<O geo={g.bolt} color="#FFD23F" emissive="#806000" />
+					</group>
+				</group>
+			) : null}
+			{kind === 'wall' ? (
+				<group position={[0, -0.2, 0]}>
+					{Array.from({length: 4}).map((_, r) =>
+						Array.from({length: 3}).map((_, c) => {
+							const k = r * 3 + c;
+							const drop = spring({frame: lf - k * 1.5, fps, config: {damping: 11, stiffness: 220}});
+							return <O key={k} geo={g.brick} color={k % 2 ? '#B5512C' : '#C9623A'} pos={[(c - 1) * 0.31 + (r % 2 ? 0.15 : 0), r * 0.15 + (1 - drop) * 0.8, 0]} scale={drop} />;
+						}),
+					)}
+				</group>
+			) : null}
+		</group>
+	);
+};
