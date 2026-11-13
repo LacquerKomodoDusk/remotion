@@ -8,3 +8,5 @@ remotion/public/v*.mp4
 stills/
 *.png
 v*/out/tmp.mp4
+remotion/public/cta_bg_*.png
+v*/work/cta.mp4

@@ -1,5 +1,6 @@
 import {Composition} from 'remotion';
 import {Edit, Cfg} from './Edit';
+import {CTA} from './CTA';
 import c1 from './configs/v1.json';
 import c2 from './configs/v2.json';
 import c3 from './configs/v3.json';
@@ -22,5 +23,6 @@ export const RemotionRoot: React.FC = () => (
 		{all.map((cfg, i) => (
 			<Composition key={i} id={`V${i + 1}`} component={Edit} width={1080} height={1920} fps={60} durationInFrames={cfg.frames} defaultProps={{cfg, video: `v${i + 1}.mp4`}} />
 		))}
+		<Composition id="CTA" component={CTA} width={1080} height={1920} fps={60} durationInFrames={270} defaultProps={{bg: 'cta_bg_v13.png'}} />
 	</>
 );
