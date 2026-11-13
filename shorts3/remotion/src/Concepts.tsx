@@ -639,7 +639,7 @@ const Vhs: React.FC<P> = ({cfg, t, fps, layout}) => {
 	}
 	els.push(...hitMarks(t, fps, layout, V.hits, []));
 	const lf = (t - cfg.punch.t) * fps;
-	if (lf >= 0) els.push(<Cap key="cap" lf={lf} fps={fps} top={1180} lines={[['РАНЬШЕ: маски и мувмент', 44, '#FFD23F'], ['СЕЙЧАС: мишень и палка', 50, '#FFFFFF']]} step={10} />);
+	if (lf >= 0) els.push(<Cap key="cap" lf={lf} fps={fps} top={1180} lines={[['РАНЬШЕ: маски-х*****', 48, '#FFD23F'], ['СЕЙЧАС: предметы — говно', 46, '#FFFFFF']]} step={10} />);
 	return <>{els}</>;
 };
 
@@ -793,9 +793,79 @@ const Forecast: React.FC<P> = ({cfg, t, fps}) => {
 	}
 	return <>{els}</>;
 };
+// v15 — ожидание / реальность: an esports broadcast HUD while he builds and juke-s, which breaks apart when he gets stuck in the window
+const SEG = (n: number, col: string) => (
+	<div style={{display: 'flex', gap: 6}}>{Array.from({length: 5}).map((_, i) => <div key={i} style={{width: 34, height: 20, borderRadius: 4, background: i < n ? col : 'rgba(255,255,255,0.15)', border: `3px solid ${NAVY}`}} />)}</div>
+);
+const Esports: React.FC<P> = ({cfg, t, fps, video}) => {
+	const E = cfg.es as {real: number; meter: [number, number]; drain: number; replay: [number, number, number, number]; mePip: [number, number]};
+	const els: React.ReactNode[] = [];
+	const g = (t - E.real) * fps; // frames since reality hits
+	if (t < E.real + 2.6) {
+		const real = g >= 0;
+		const fall = (i: number) => (g > 6 ? {transform: `translate(${Math.sin(i * 3) * g * 2}px, ${(g - 6) ** 2 * 0.9}px) rotate(${(i % 2 ? 1 : -1) * (g - 6) * 1.5}deg)`} : {});
+		const jit = real && g < 8 ? {transform: `translate(${Math.sin(g * 9) * 14}px, 0)`, textShadow: '6px 0 0 rgba(255,0,60,0.8), -6px 0 0 rgba(0,200,255,0.8)'} : {};
+		const apm = real ? Math.max(0, 3 - Math.floor(g / 20)) : 380 + Math.round(Math.abs(Math.sin(t * 7.3)) * 60);
+		const o = interpolate(t, [0, 0.15], [0, 1], {extrapolateRight: 'clamp'});
+		els.push(
+			<div key="top" style={{position: 'absolute', left: 50, top: 200, display: 'flex', alignItems: 'center', gap: 12, opacity: o, ...fall(1)}}>
+				<div style={{display: 'flex', alignItems: 'center', gap: 10, background: real ? '#4A4F5C' : RED, border: `5px solid ${NAVY}`, borderRadius: 12, padding: '6px 14px', boxShadow: `0 6px 0 ${NAVY}`}}>
+					<div style={{width: 16, height: 16, borderRadius: 8, background: '#FFFFFF', opacity: real ? 0.3 : Math.floor(t * 2.5) % 2 ? 1 : 0.35}} />
+					<span style={txt(30, '#FFFFFF')}>{real ? 'ОФЛАЙН' : 'LIVE'}</span>
+				</div>
+				<div style={{background: real ? '#2B2F3A' : 'linear-gradient(90deg, #1A1F2E, #3B1A8F)', border: `5px solid ${real ? '#6B6656' : GOLD}`, outline: `4px solid ${NAVY}`, borderRadius: 12, padding: '6px 18px'}}>
+					<span style={txt(34, real ? '#9AA3B8' : GOLD, jit)}>{real ? 'РЕАЛЬНОСТЬ' : 'КИБЕРСПОРТ · ФИНАЛ'}</span>
+				</div>
+			</div>,
+		);
+		els.push(
+			<div key="stats" style={{position: 'absolute', left: 50, top: 1290, width: 560, opacity: o, ...fall(2)}}>
+				<div style={{background: real ? 'rgba(43,47,58,0.92)' : 'rgba(11,21,48,0.86)', border: `5px solid ${real ? '#6B6656' : GOLD}`, borderRadius: 18, padding: '14px 20px', boxShadow: `0 8px 0 ${NAVY}`}}>
+					<div style={txt(24, real ? '#9AA3B8' : '#F4D9A0', {letterSpacing: '0.14em', ...jit})}>{real ? 'СТАТИСТИКА: ФАКТ' : 'СТАТИСТИКА ИГРОКА'}</div>
+					{([['СТРОЙКА', real ? 0 : 5], ['МАНСЫ', real ? 0 : 5]] as [string, number][]).map(([k, n]) => (
+						<div key={k} style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 10}}>
+							<span style={txt(30, '#FFFFFF')}>{k}</span>
+							{SEG(n, real ? '#FF3B3B' : '#7CFF6B')}
+						</div>
+					))}
+					<div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginTop: 10}}>
+						<span style={txt(30, '#FFFFFF')}>APM</span>
+						<span style={txt(42, real ? '#FF3B3B' : '#FFD23F')}>{apm}</span>
+					</div>
+				</div>
+			</div>,
+		);
+		if (real && g < 14) els.push(<div key="gl" style={{position: 'absolute', inset: 0, background: `repeating-linear-gradient(0deg, rgba(255,0,60,0.18) 0 6px, rgba(0,200,255,0.12) 6px 12px, rgba(0,0,0,0) 12px 40px)`, transform: `translateY(${(g * 31) % 40}px)`, opacity: 1 - g / 14}} />);
+	}
+	// hope meter (ожидание: шедевр) → «+0» on «ранг защищён»
+	const [m0, m1] = E.meter;
+	if (t >= m0 && ((t < E.replay[0]) || t >= E.drain - 1.6)) {
+		const fill = interpolate(t, [m0, m1], [0.05, 0.92], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'}) * interpolate(t, [E.drain, E.drain + 0.5], [1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.in(Easing.cubic)});
+		const drained = t >= E.drain + 0.5;
+		els.push(
+			<div key="mt" style={{position: 'absolute', left: 70, top: 1300, width: 780}}>
+				<div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'baseline'}}>
+					<span style={txt(30, '#FFFFFF', strokeS)}>ОЖИДАНИЕ: ШЕДЕВР</span>
+					<span style={txt(48, drained ? '#FF3B3B' : '#7CFF6B', strokeS)}>{drained ? '+0' : `${Math.round(fill * 100)}%`}</span>
+				</div>
+				<div style={{marginTop: 8, height: 32, borderRadius: 10, border: `5px solid ${NAVY}`, background: '#1A1F2E', overflow: 'hidden', position: 'relative', boxShadow: `0 6px 0 ${NAVY}`}}>
+					<div style={{position: 'absolute', left: 0, top: 0, bottom: 0, width: `${fill * 100}%`, background: 'linear-gradient(90deg, #3DBA4E, #7CFF6B, #FFD23F)'}} />
+				</div>
+			</div>,
+		);
+	}
+	const [r0, rSrc, rate, rDur] = E.replay;
+	els.push(
+		<ReplayPip key="rp" t={t} fps={fps} video={video} r0={r0} rSrc={rSrc} rate={rate} rDur={rDur} h={520} tag={() => ['РЕАЛЬНОСТЬ ×0.5', '#9AA3B8']}
+			over={(srcT, k) => (srcT >= E.real && srcT < E.real + 1.7 ? <div style={{position: 'absolute', left: E.mePip[0] * k - 70, top: (E.mePip[1] - 604) * k - 110, width: 140, height: 220, border: '6px solid #FF2A2A', borderRadius: 8}} /> : null)} />,
+	);
+	const lf = (t - cfg.punch.t) * fps;
+	if (lf >= 0 && t < E.drain - 1.6) els.push(<Cap key="cap" lf={lf} fps={fps} top={1365} lines={[['ожидание: киберспорт, стройка, мансы', 34, '#FFD23F'], ['реальность: застрял в окне', 46, '#FFFFFF']]} step={9} />);
+	return <>{els}</>;
+};
 
 export const Concept: React.FC<P> = (p) => {
-	const m: Record<string, React.FC<P>> = {airport: Airport, tir: Tir, tabloid: Tabloid, cctv: Cctv, museum: Museum, captcha: Captcha, jar: Jar, tip: Tip, boss: Boss, ammo: Ammo, theatre: Theatre, house: HouseCount, vhs: Vhs, gacha: Gacha, bot: BotScan, forecast: Forecast};
+	const m: Record<string, React.FC<P>> = {airport: Airport, tir: Tir, tabloid: Tabloid, cctv: Cctv, museum: Museum, captcha: Captcha, jar: Jar, tip: Tip, boss: Boss, ammo: Ammo, theatre: Theatre, house: HouseCount, vhs: Vhs, gacha: Gacha, bot: BotScan, esports: Esports, forecast: Forecast};
 	const C = m[p.cfg.concept];
 	return C ? <C {...p} /> : null;
 };

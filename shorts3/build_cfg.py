@@ -180,8 +180,8 @@ C[14]={"frames":937,"concept":"gacha",
  "sfx":[["drumroll",0.3,1.6],["sub",1.9,0.3],["trombone",2.45],["jam",2.95],["whoosh",5.6],["whoosh",7.75],["whoosh",10.4],["rewind",11.55]],
  "gacha":{"start":0.3,"peak":1.9,"crash":2.45,"vinyl":2.9,"vinylOut":5.6,"chest":[637,603],"replay":[11.75,0.2,0.7,3.8]},
  "punch":{"t":13.4}}
-# v15 — «бот е*****» … stuck on a window ledge and killed; then hopes for rank points, gets «ранг защищён»
-C[15]={"frames":1799,"concept":"bot",
+# v15 — expectation (esports: builds, juke-s) vs reality: stuck on a window ledge and killed; then hopes for rank points, gets «ранг защищён»
+C[15]={"frames":1799,"concept":"esports",
  "words":ws([("застроили",0.16,'panic','shout'),("не",1.12,'confident',''),("надо",1.28,'confident',''),("на",1.6,'confident',''),("везение",1.76,'confident',''),("рассчитывать",2.28,'confident',''),
    ("б****",5.97,'anger','mat'),("бот",6.29,'anger','shout'),("е*****",6.61,'anger','mat'),("иди",7.09,'anger',''),("н****",7.29,'anger','mat'),
    ("можешь",8.85,'irony',''),("выиграть",9.25,'irony',''),("аккуратно",9.77,'irony',''),
@@ -191,9 +191,9 @@ C[15]={"frames":1799,"concept":"bot",
  "layouts":[[0,'game_full'],[4.4,'split'],[5.0,'game_full'],[8.6,'split'],[11.8,'game_full'],[15.2,'cam_full'],[17.4,'split']],
  "gameFull":GF,"gameKeys":[[0,1.0,0.5,0.45]],
  "punches":[[0.16,'game',0.08],[6.29,'game',0.10],[13.3,'game',0.10],[15.98,'cam',0.10],[21.04,'cam',0.12],[27.12,'cam',0.08]],"shake":[[13.3,13.8,6],[14.07,14.5,10]],
- "loud":[[0,4.4],[5.0,8.6],[11.8,15.2]],"freezes":[[14.07,15.2,14.07]],"grades":[[14.07,15.2,"grayscale(1) contrast(1.2)"]],"flashes":[[14.07,0.7],[6.29,0.2]],
- "sfx":[["whoosh",4.35],["whoosh",4.95],["beep",5.0],["beep",5.25],["beep",5.5],["beep",5.75],["alarm",6.29],["whoosh",8.55],["whoosh",11.75],["beep",12.5],["beep",12.75],["beep",13.0],["alarm",13.3],["sub",14.07,0.35],["whoosh",15.15],["whoosh",17.35],["rewind",21.85],["buzz",28.5]],
- "bot":{"lock":[5.0,7.3],"enemy":[654,706],"label":6.29,"self":[12.5,15.2],"me":[300,950],"selfLabel":13.3,"meter":[18.28,21.6],"drain":28.5,"replay":[22.0,12.3,0.5,3.6],"mePip":[321,1112]},
+ "loud":[[0,4.4],[5.0,8.6],[11.8,15.2]],"freezes":[[14.07,15.2,14.07]],"grades":[[14.07,15.2,"grayscale(1) contrast(1.2)"]],"flashes":[[14.07,0.7],[12.5,0.35]],
+ "sfx":[["applause",0.1,1.4],["whoosh",4.35],["whoosh",4.95],["applause",6.29,0.8],["whoosh",8.55],["whoosh",11.75],["static",12.5],["buzz",12.55],["sub",14.07,0.35],["whoosh",15.15],["whoosh",17.35],["rewind",21.85],["buzz",28.5]],
+ "es":{"real":12.5,"meter":[18.28,21.6],"drain":28.5,"replay":[22.0,12.3,0.5,3.6],"mePip":[321,1112]},
  "punch":{"t":22.1}}
 # v16 — «никого же нету» → «ой, есть» (fired at on landing) → «застроился»
 C[16]={"frames":1079,"concept":"forecast",
