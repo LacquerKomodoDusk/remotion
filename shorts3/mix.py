@@ -106,5 +106,14 @@ for e in cfg['sfx']:
   elif kind=='thunder': # crack + rumble
     t=T(1.6); s_=sosfilt(butter(2,600,'low',fs=SR,output='sos'),rng.standard_normal(len(t)))*np.exp(-t*2.2)*1.2
     s_[:int(0.05*SR)]+=sosfilt(bp(1500,8000),rng.standard_normal(int(0.05*SR)))*0.8; add(s_*0.22,t0)
+  elif kind=='echo':    # repeat an already-mixed span with decaying, darkening taps: [echo, src0, src1, at, taps]
+    a,b=int(e[1]*SR),int(e[2]*SR); seg=y[a:b].copy(); at=e[3]; taps=e[4] if len(e)>4 else 4
+    lp=butter(2,2500,'low',fs=SR,output='sos')
+    for k in range(1,taps+1):
+      seg=sosfilt(lp,seg,axis=0); o=int((at+0.22*k)*SR); n=min(len(seg),N-o)
+      if n>0: y[o:o+n]+=seg[:n]*(0.55**k)
+  elif kind=='shimmer': # rising magical sweep (or falling with e[2]=-1)
+    d=0.9; t=T(d); up=e[2] if len(e)>2 else 1; f=(600+2400*t/d) if up>0 else (3000-2400*t/d)
+    s_=sum(np.sin(2*np.pi*np.cumsum(f*m)/SR)/m for m in (1,1.5,2.01)); add(s_*np.sin(np.pi*t/d)**2*0.05,t0)
 y[-int(.004*SR):]*=np.linspace(1,0,int(.004*SR))[:,None]
 sf.write(f'v{v}/work/mix_premaster.wav',y.astype(np.float32),SR); print(v,'peak',round(float(np.abs(y).max()),3))

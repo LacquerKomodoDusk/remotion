@@ -512,3 +512,40 @@ export const PirateCoin: React.FC<{lf: number; fps: number; at: [number, number]
 		</group>
 	);
 };
+
+// ---------- v16: crystal ball (prophecy) ----------
+export const CrystalBall: React.FC<{t: number; lf: number; fps: number; at: [number, number]; scale: number}> = ({t, lf, fps, at, scale}) => {
+	const g = useMemo(() => ({
+		ball: new THREE.SphereGeometry(0.5, 48, 32),
+		knot: new THREE.TorusKnotGeometry(0.2, 0.05, 96, 12, 2, 3),
+		base: new THREE.CylinderGeometry(0.28, 0.4, 0.22, 32),
+		ring: new THREE.TorusGeometry(0.33, 0.04, 12, 40),
+		spark: new THREE.OctahedronGeometry(0.04, 0),
+	}), []);
+	if (lf < 0) return null;
+	const p = spring({frame: lf, fps, config: {damping: 10, stiffness: 160}});
+	const [x, y] = px2w(at[0], at[1]);
+	return (
+		<group position={[x, y, 0]} scale={p * scale}>
+			<O geo={g.base} color="#FFC83D" metal={0.3} emissive="#4A3000" pos={[0, -0.55, 0]} />
+			<O geo={g.ring} color="#FFC83D" metal={0.3} emissive="#4A3000" pos={[0, -0.43, 0]} rot={[Math.PI / 2, 0, 0]} line={1} />
+			<mesh geometry={g.knot} rotation={[t * 1.3, t * 1.7, t * 0.9]} scale={1 + Math.sin(t * 4) * 0.08}>
+				<meshBasicMaterial color={Math.sin(t * 2) > 0 ? '#B69CFF' : '#5AC8FF'} />
+			</mesh>
+			<mesh geometry={g.ball}>
+				<meshStandardMaterial color="#9FD8FF" transparent opacity={0.32} roughness={0.05} metalness={0.1} emissive="#3A1A8F" emissiveIntensity={0.4} />
+			</mesh>
+			<mesh geometry={g.ball} scale={1.06}>
+				<meshBasicMaterial color={NAVY} side={THREE.BackSide} />
+			</mesh>
+			{Array.from({length: 6}).map((_, i) => {
+				const a = t * 1.5 + (i / 6) * Math.PI * 2;
+				return (
+					<mesh key={i} geometry={g.spark} position={[Math.cos(a) * 0.75, Math.sin(a * 1.7) * 0.3, Math.sin(a) * 0.75]} scale={0.6 + 0.4 * Math.sin(t * 5 + i)}>
+						<meshBasicMaterial color="#E9DDFF" />
+					</mesh>
+				);
+			})}
+		</group>
+	);
+};

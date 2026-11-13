@@ -2,7 +2,7 @@ import React from 'react';
 import {Easing, OffthreadVideo, Sequence, interpolate, spring} from 'remotion';
 import type {Cfg} from './Edit';
 import {FONT, NAVY} from './theme';
-import {Stage, Shells, Splinters, CrownTree, Curtains, Flowers, House, Pad, OniMask, Vinyl, Weather, PirateCoin} from './Three3D';
+import {Stage, Shells, Splinters, CrownTree, Curtains, Flowers, House, Pad, OniMask, Vinyl, Weather, PirateCoin, CrystalBall} from './Three3D';
 
 // Per-video "seasoning": one concept each + the ONE editorial caption (punchline).
 // Concept colours never reuse the subtitle emotion colours as text colour on purpose.
@@ -863,9 +863,72 @@ const Esports: React.FC<P> = ({cfg, t, fps, video}) => {
 	if (lf >= 0 && t < E.drain - 1.6) els.push(<Cap key="cap" lf={lf} fps={fps} top={1365} lines={[['ожидание: киберспорт, стройка, мансы', 34, '#FFD23F'], ['реальность: застрял в окне', 46, '#FFFFFF']]} step={9} />);
 	return <>{els}</>;
 };
+// v16 — prophecy: «прыгну — меня е****» opens a vision of the future (the landing under fire) with echo; then it comes true
+const Prophecy: React.FC<P> = ({cfg, t, fps, video}) => {
+	const R = cfg.pr as {vision: [number, number]; fut: number; due: number; chipOut: number};
+	const [v0, v1] = R.vision;
+	const els: React.ReactNode[] = [];
+	// 1) the vision: future footage full-screen, dream grade, ghost echo trail, ripples
+	if (t >= v0 - 0.05 && t < v1 + 0.1) {
+		const k = (t - v0) * fps;
+		const o = interpolate(t, [v0 - 0.05, v0 + 0.12, v1 - 0.12, v1 + 0.1], [0, 1, 1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+		const S = 1920 / 1028, L = -164 * S - 2, T = -604 * S;
+		const vid = (delay: number, op: number, sc: number, key: string) => (
+			<div key={key} style={{position: 'absolute', inset: 0, opacity: op, transform: `scale(${sc})`}}>
+				<Sequence from={Math.round(v0 * fps)} layout="none">
+					<OffthreadVideo src={video} muted startFrom={Math.max(0, Math.round((R.fut - delay) * fps))} style={{position: 'absolute', left: L, top: T, width: 918 * S, height: 1632 * S, maxWidth: 'none', filter: 'hue-rotate(200deg) saturate(1.35) contrast(1.1) brightness(1.08)'}} />
+				</Sequence>
+			</div>
+		);
+		els.push(
+			<div key="vision" style={{position: 'absolute', inset: 0, opacity: o, overflow: 'hidden', background: '#120A2E'}}>
+				{vid(0, 1, 1 + k * 0.0012, 'a')}
+				{vid(0.15, 0.4, 1.05 + k * 0.0012, 'b')}
+				{vid(0.3, 0.22, 1.1 + k * 0.0012, 'c')}
+				<div style={{position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 50% 45%, rgba(0,0,0,0) 35%, rgba(60,20,140,0.75) 85%)'}} />
+				<svg width={1080} height={1920} style={{position: 'absolute', left: 0, top: 0, mixBlendMode: 'screen'}}>
+					{[0, 1, 2].map((i) => {
+						const r = ((k * 9 + i * 260) % 780) + 40;
+						return <circle key={i} cx={540} cy={900} r={r} fill="none" stroke="#C9B6FF" strokeWidth={6} opacity={Math.max(0, 1 - r / 820) * 0.7} />;
+					})}
+				</svg>
+				<div style={{position: 'absolute', left: 0, width: 918, top: 1330, textAlign: 'center', ...txt(40, '#E9DDFF', {...strokeS, letterSpacing: '0.2em'})}}>ВИДЕНИЕ БУДУЩЕГО</div>
+			</div>,
+		);
+	}
+	// 2) the prophecy chip with a countdown, then «СБЫЛОСЬ»
+	if (t >= v0 && t < R.chipOut) {
+		const fulfilled = t >= R.due;
+		const left = Math.max(0, R.due - t);
+		const k2 = (t - (fulfilled ? R.due : v0)) * fps;
+		const flip = interpolate(k2, [0, 8], [90, 0], {extrapolateRight: 'clamp', easing: Easing.out(Easing.back(2))});
+		const o = interpolate(t, [R.chipOut - 0.3, R.chipOut], [1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+		els.push(
+			<div key="chip" style={{position: 'absolute', left: 50, top: 200, width: 520, height: 160, perspective: 700, opacity: o}}>
+				<div style={{transform: `rotateX(${flip}deg)`, background: fulfilled ? 'linear-gradient(135deg, #1E8A3A, #0F5A24)' : 'linear-gradient(135deg, #5B2BC8, #2A1270)', border: `5px solid ${NAVY}`, borderRadius: 22, boxShadow: `0 8px 0 ${NAVY}`, height: '100%', paddingLeft: 170, display: 'flex', flexDirection: 'column', justifyContent: 'center'}}>
+					<div style={txt(22, fulfilled ? '#B8FFC6' : '#D9CCFF', {letterSpacing: '0.16em'})}>ПРЕДСКАЗАНИЕ</div>
+					{fulfilled ? <div style={txt(50, '#FFFFFF', {marginTop: 4})}>СБЫЛОСЬ ✓</div> : t < v1 ? <div style={txt(40, '#FFFFFF', {marginTop: 4})}>видение…</div> : <>
+						<div style={txt(26, '#FFFFFF', {marginTop: 4})}>сбудется через</div>
+						<div style={txt(44, '#FFD23F', {marginTop: 2})}>{left.toFixed(1).replace('.', ',')} с</div>
+					</>}
+				</div>
+			</div>,
+		);
+		els.push(<Stage key="ballS"><CrystalBall t={t} lf={(t - v0) * fps} fps={fps} at={[132, 282]} scale={0.38} /></Stage>);
+	}
+	// 3) déjà vu flash when it comes true
+	const dk = (t - R.due) * fps;
+	if (dk >= 0 && dk < 18) els.push(<div key="dv" style={{position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 50% 45%, rgba(0,0,0,0) 30%, rgba(90,40,200,0.7) 90%)', opacity: 1 - dk / 18, mixBlendMode: 'screen'}} />);
+	const lf = (t - cfg.punch.t) * fps;
+	if (lf >= 0) {
+		els.push(<Stage key="ball"><CrystalBall t={t} lf={lf} fps={fps} at={[459, 1050]} scale={1.0} /></Stage>);
+		els.push(<Cap key="cap" lf={lf - 8} fps={fps} top={1270} lines={[['ПРЕДСКАЗАНИЕ СБЫЛОСЬ', 50, '#B69CFF'], ['точность: 100%', 44, '#FFFFFF']]} step={9} />);
+	}
+	return <>{els}</>;
+};
 
 export const Concept: React.FC<P> = (p) => {
-	const m: Record<string, React.FC<P>> = {airport: Airport, tir: Tir, tabloid: Tabloid, cctv: Cctv, museum: Museum, captcha: Captcha, jar: Jar, tip: Tip, boss: Boss, ammo: Ammo, theatre: Theatre, house: HouseCount, vhs: Vhs, gacha: Gacha, bot: BotScan, esports: Esports, forecast: Forecast};
+	const m: Record<string, React.FC<P>> = {airport: Airport, tir: Tir, tabloid: Tabloid, cctv: Cctv, museum: Museum, captcha: Captcha, jar: Jar, tip: Tip, boss: Boss, ammo: Ammo, theatre: Theatre, house: HouseCount, vhs: Vhs, gacha: Gacha, bot: BotScan, esports: Esports, forecast: Forecast, prophecy: Prophecy};
 	const C = m[p.cfg.concept];
 	return C ? <C {...p} /> : null;
 };
